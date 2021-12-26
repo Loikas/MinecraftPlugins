@@ -1,0 +1,24 @@
+main: me.Loikas.ExpandedEnchants.Main
+name: ExpandedEnchants
+description: More enchants and improved vanilla system
+author: Loikas
+api-version: 1.18
+version: 1.0
+commands:
+    expandedenchants:
+        description: All expandedenchant commands
+        usage: "Usage /<command>  <give|reload|enchant|recipes>  <enchant> [level]"
+        aliases: ee
+permissions:
+    ee.command.creative:
+        description: Allows for easier creative mode by using /ee
+        default: op
+    ee.command.reload:
+        description: Reloads the config file
+        default: op
+    ee.command.enchant:
+        description: Allows you to enchant items using the command
+        default: op
+    ee.command.give:
+        description: Allows you to give yourself custom enchantment books
+        default: op
