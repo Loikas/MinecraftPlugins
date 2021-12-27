@@ -1,5 +1,5 @@
 # ExpandedEnchants
-The spigot project to make Echantments+ available for spigot and paper servers.
+The spigot project to make Echantment+ available for spigot and paper servers.
 With a few added bonusses
 
 ## Manage permissions
