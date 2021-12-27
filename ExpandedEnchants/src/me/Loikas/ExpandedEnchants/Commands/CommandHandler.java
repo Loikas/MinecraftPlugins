@@ -19,11 +19,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import Inventories.CustomRecipeInventory;
-import Inventories.VanillaRecipeInventory;
 import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
+import me.Loikas.ExpandedEnchants.Inventories.CustomRecipeInventory;
+import me.Loikas.ExpandedEnchants.Inventories.VanillaRecipeInventory;
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandHandler implements CommandExecutor

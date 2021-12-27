@@ -1166,7 +1166,7 @@ public class EventsClass implements Listener
 			EnchantmentStorageMeta meta = (EnchantmentStorageMeta) fs.getItemMeta();
 			Object[] enchs = meta.getStoredEnchants().keySet().toArray();
 			if(enchs.length == 1) return;
-			Enchantment removeEnchant = (Enchantment) enchs[0];
+			Enchantment removeEnchant = (Enchantment) enchs[enchs.length - 1];
 			ItemStack resultBook = new ItemStack(Material.ENCHANTED_BOOK);
 			EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) resultBook.getItemMeta();
 			resultMeta.addStoredEnchant(removeEnchant, meta.getStoredEnchantLevel(removeEnchant), true);
@@ -1180,7 +1180,7 @@ public class EventsClass implements Listener
 		{
 			Object[] enchs = fs.getItemMeta().getEnchants().keySet().toArray();
 			if(enchs.length == 0) return;
-			Enchantment removeEnchant = (Enchantment) enchs[0];
+			Enchantment removeEnchant = (Enchantment) enchs[enchs.length - 1];
 			ItemStack resultBook = new ItemStack(Material.ENCHANTED_BOOK);
 			EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) resultBook.getItemMeta();
 			if(functions.IsCustomEnchant(removeEnchant)) {
@@ -1746,11 +1746,11 @@ public class EventsClass implements Listener
 										if(removeLastEnchant) {
 											if(firstItem.getType() == Material.ENCHANTED_BOOK) {
 												EnchantmentStorageMeta firstMeta = (EnchantmentStorageMeta) firstItem.getItemMeta();
-												firstMeta.removeStoredEnchant((Enchantment) firstMeta.getStoredEnchants().keySet().toArray()[0]);
+												firstMeta.removeStoredEnchant((Enchantment) firstMeta.getStoredEnchants().keySet().toArray()[firstMeta.getStoredEnchants().keySet().size() - 1]);
 												firstItem.setItemMeta(firstMeta);
 											}
 											else {
-												Enchantment removeEnch = (Enchantment) firstItem.getEnchantments().keySet().toArray()[0];
+												Enchantment removeEnch = (Enchantment) firstItem.getEnchantments().keySet().toArray()[firstItem.getEnchantments().keySet().size() - 1];
 												firstItem.removeEnchantment(removeEnch);
 												if(functions.IsCustomEnchant(removeEnch)) {
 													ItemMeta enchmeta = firstItem.getItemMeta();
