@@ -12,6 +12,7 @@ To reload the plugins config file
 -ee.command.creative
 To allow players to go in creative easier using /ee
 
+## Easy to look at recipes and change things
 Take an easy look at the recipes of both custom and vanilla enchantment recipes
 using the interactive gui you get with /ee recipes
 
