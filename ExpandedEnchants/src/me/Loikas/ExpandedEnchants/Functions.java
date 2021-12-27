@@ -1,5 +1,6 @@
 package me.Loikas.ExpandedEnchants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -17,6 +18,34 @@ public class Functions
 	
 	public double GetRandomNumber(double min, double max) {
 		return Math.random() * (max - min) + min;
+	}
+	
+	public List<Enchantment> GetEnabledEnchants() {
+		List<Enchantment> enchs = new ArrayList<>();
+		if(Main.getPlugin().getConfig().getBoolean("AntigravityEnabled")) enchs.add(CustomEnchantsManager.ANTIGRAVITY);
+		if(Main.getPlugin().getConfig().getBoolean("AutosmeltEnabled")) enchs.add(CustomEnchantsManager.AUTOSMELT);
+		if(Main.getPlugin().getConfig().getBoolean("BeheadingEnabled")) enchs.add(CustomEnchantsManager.BEHEADING);
+		if(Main.getPlugin().getConfig().getBoolean("DeflectEnabled")) enchs.add(CustomEnchantsManager.DEFLECT);
+		if(Main.getPlugin().getConfig().getBoolean("DirectEnabled")) enchs.add(CustomEnchantsManager.DIRECT);
+		if(Main.getPlugin().getConfig().getBoolean("EyesofowlEnabled")) enchs.add(CustomEnchantsManager.OWLEYES);
+		if(Main.getPlugin().getConfig().getBoolean("ExperienceboostEnabled")) enchs.add(CustomEnchantsManager.EXP_BOOST);
+		if(Main.getPlugin().getConfig().getBoolean("FeedingmoduleEnabled")) enchs.add(CustomEnchantsManager.FEEDINGMODULE);
+		if(Main.getPlugin().getConfig().getBoolean("HealthboostEnabled")) enchs.add(CustomEnchantsManager.HEALTHBOOST);
+		if(Main.getPlugin().getConfig().getBoolean("HeavenslightnessEnabled")) enchs.add(CustomEnchantsManager.HEAVENSLIGHTNESS);
+		if(Main.getPlugin().getConfig().getBoolean("IcyEnabled")) enchs.add(CustomEnchantsManager.ICY);
+		if(Main.getPlugin().getConfig().getBoolean("LavawalkerEnabled")) enchs.add(CustomEnchantsManager.LAVA_WALKER);
+		if(Main.getPlugin().getConfig().getBoolean("LeapingEnabled")) enchs.add(CustomEnchantsManager.LEAPING);
+		if(Main.getPlugin().getConfig().getBoolean("LifestealEnabled")) enchs.add(CustomEnchantsManager.LIFESTEAL);
+		if(Main.getPlugin().getConfig().getBoolean("LumberjackEnabled")) enchs.add(CustomEnchantsManager.LUMBERJACK);
+		if(Main.getPlugin().getConfig().getBoolean("ReplantingEnabled")) enchs.add(CustomEnchantsManager.REPLANTING);
+		if(Main.getPlugin().getConfig().getBoolean("ShadowstepEnabled")) enchs.add(CustomEnchantsManager.SHADOWSTEP);
+		if(Main.getPlugin().getConfig().getBoolean("StonefistsEnabled")) enchs.add(CustomEnchantsManager.STONEFISTS);
+		if(Main.getPlugin().getConfig().getBoolean("ThermalplatingEnabled")) enchs.add(CustomEnchantsManager.THERMALPLATING);
+		if(Main.getPlugin().getConfig().getBoolean("TravelerEnabled")) enchs.add(CustomEnchantsManager.TRAVELER);
+		if(Main.getPlugin().getConfig().getBoolean("UnbreakableEnabled")) enchs.add(CustomEnchantsManager.NOBREAKABLE);
+		if(Main.getPlugin().getConfig().getBoolean("VeinmineEnabled")) enchs.add(CustomEnchantsManager.VEINMINE);
+		if(Main.getPlugin().getConfig().getBoolean("WideEnabled")) enchs.add(CustomEnchantsManager.WIDE);
+		return enchs;
 	}
 	
 	public int GetSlot(int i) {

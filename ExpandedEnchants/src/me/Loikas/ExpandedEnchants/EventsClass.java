@@ -180,8 +180,10 @@ public class EventsClass implements Listener
 		List<MerchantRecipe> recipes = trader.getRecipes();
 		List<MerchantRecipe> newRecipes = new ArrayList<MerchantRecipe>();
 		for(MerchantRecipe r : recipes) newRecipes.add(r);
-		int ranEnch = functions.GetRandomNumber(0, CustomEnchantsManager.custom_enchants.size());
-		ItemStack enchant = Main.itemManager.CreateCustomBook(CustomEnchantsManager.custom_enchants.get(ranEnch), 1);
+		
+		if(functions.GetEnabledEnchants().size() == 0) return; 
+		int ranEnch = functions.GetRandomNumber(0, functions.GetEnabledEnchants().size());
+		ItemStack enchant = Main.itemManager.CreateCustomBook(functions.GetEnabledEnchants().get(ranEnch), 1);
 		MerchantRecipe bookRecipe = new MerchantRecipe(enchant, functions.GetRandomNumber(2, 5));
 		ArrayList<ItemStack> ing = CustomEnchantsManager.tradeCosts[ranEnch].getItems();
 		bookRecipe.setIngredients(ing);
