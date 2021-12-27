@@ -1217,7 +1217,7 @@ public class EventsClass implements Listener
 			resultItem.setItemMeta(meta);
 			e.setResult(resultItem);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
-				e.getInventory().setRepairCost(20);
+				e.getInventory().setRepairCost(1);
 				for(HumanEntity he : e.getViewers()) {
 					Player pl = (Player) he;
 					pl.updateInventory();
@@ -1232,23 +1232,24 @@ public class EventsClass implements Listener
 			ItemStack resultItem = new ItemStack(fs);
 			EnchantmentStorageMeta meta = (EnchantmentStorageMeta) fs.getItemMeta();;
 			if (ss.getAmount() < Main.recipeManager.GetAmount(ench)) return;
+			int MaxLevel = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
 			if(meta.hasStoredEnchant(ench)) 
 			{
 				if(ench == Enchantment.LURE) 
 				{
-					if(meta.getStoredEnchantLevel(ench) < 3) 
+					if(meta.getStoredEnchantLevel(ench) < (MaxLevel < 3 ? MaxLevel : 3)) 
 					{
 						meta.addStoredEnchant(ench, meta.getStoredEnchantLevel(ench) + 1, true);
 					}
 				}
 				else if (ench == Enchantment.QUICK_CHARGE) 
 				{
-					if(meta.getStoredEnchantLevel(ench) < 5) 
+					if(meta.getStoredEnchantLevel(ench) < (MaxLevel < 5 ? MaxLevel : 5)) 
 					{
 						meta.addStoredEnchant(ench, meta.getStoredEnchantLevel(ench) + 1, true);
 					}
 				}
-				else if(meta.getStoredEnchantLevel(ench) < 10) 
+				else if(meta.getStoredEnchantLevel(ench) < MaxLevel) 
 				{
 					meta.addStoredEnchant(ench, meta.getStoredEnchantLevel(ench) + 1, true);
 				}
@@ -1260,7 +1261,7 @@ public class EventsClass implements Listener
 			resultItem.setItemMeta(meta);
 			e.setResult(resultItem);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
-				e.getInventory().setRepairCost(20);
+				e.getInventory().setRepairCost((meta.getStoredEnchantLevel(ench) + 1) * (meta.getStoredEnchantLevel(ench) + 1));
 				for(HumanEntity he : e.getViewers()) {
 					Player pl = (Player) he;
 					pl.updateInventory();
@@ -1286,7 +1287,10 @@ public class EventsClass implements Listener
 			if(!item.canEnchantItem(fs)) return;
 			if(fs.getItemMeta().hasEnchant(item)) {
 				if(meta.getStoredEnchantLevel(item) == itemMeta.getEnchantLevel(item)) {
-					if(itemMeta.getEnchantLevel(item) < 10) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
+					int MaxLvl = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
+					if(item == Enchantment.QUICK_CHARGE) if(itemMeta.getEnchantLevel(item) < (MaxLvl < 5 ? MaxLvl : 5)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
+					else if(item == Enchantment.LURE) if(itemMeta.getEnchantLevel(item) < (MaxLvl < 3 ? MaxLvl : 3)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
+					else if(itemMeta.getEnchantLevel(item) < MaxLvl) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
 				}
 				if(meta.getStoredEnchantLevel(item) > itemMeta.getEnchantLevel(item)) {
 					resultMeta.addEnchant(item, meta.getStoredEnchantLevel(item), true);
@@ -1367,7 +1371,7 @@ public class EventsClass implements Listener
 					resultMeta.addStoredEnchant(item, 10, true);
 				}
 				else if (resultMeta.getStoredEnchantLevel(item) == ssMeta.getStoredEnchantLevel(item)){
-					resultMeta.addStoredEnchant(item, resultMeta.getStoredEnchantLevel(item) + 1, true);
+					if(resultMeta.getStoredEnchantLevel(item) + 1 < Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel")) resultMeta.addStoredEnchant(item, resultMeta.getStoredEnchantLevel(item) + 1, true);
 				}
 				else if (resultMeta.getStoredEnchantLevel(item) > ssMeta.getStoredEnchantLevel(item)) {
 					resultMeta.addStoredEnchant(item, resultMeta.getStoredEnchantLevel(item), true);
@@ -1557,9 +1561,10 @@ public class EventsClass implements Listener
 				{
 					if(ssLevel > fsLevel) resultItem.addUnsafeEnchantment(enc, ssLevel);
 					if(ssLevel == fsLevel) {
-						if(ssLevel == 3 && enc.equals(Enchantment.LURE)) continue;
-						else if(ssLevel == 5 && enc.equals(Enchantment.QUICK_CHARGE)) continue;
-						else if(ssLevel == 10) continue;
+						int Mxlvl = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
+						if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.LURE)) continue;
+						else if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.QUICK_CHARGE)) continue;
+						else if(ssLevel == Mxlvl) continue;
 						else resultItem.addUnsafeEnchantment(enc, ssLevel + 1);
 					}
 				}
@@ -1655,9 +1660,10 @@ public class EventsClass implements Listener
 
 
 		if(fs.getItemMeta().hasEnchants()) {
+			int MaxLevel = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
 			if(fs.getItemMeta().hasEnchant(goal)) {
-				if((goal == Enchantment.LURE && fs.getItemMeta().getEnchantLevel(goal) == 3) || (goal == Enchantment.QUICK_CHARGE && fs.getItemMeta().getEnchantLevel(goal) == 5)) return;
-				if(fs.getItemMeta().getEnchantLevel(goal) == 10) return;
+				if((goal == Enchantment.LURE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 3 ? MaxLevel : 3)) || (goal == Enchantment.QUICK_CHARGE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 5 ? MaxLevel : 5))) return;
+				if(fs.getItemMeta().getEnchantLevel(goal) == Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel")) return;
 			}
 		}
 
@@ -1677,7 +1683,7 @@ public class EventsClass implements Listener
 		e.getInventory().setItem(2, result);
 		e.setResult(result);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
-			e.getInventory().setRepairCost(20);
+			e.getInventory().setRepairCost(tot * tot);
 			for(HumanEntity he : e.getViewers()) {
 				Player pl = (Player) he;
 				pl.updateInventory();

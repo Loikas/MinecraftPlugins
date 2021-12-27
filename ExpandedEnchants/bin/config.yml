@@ -17,6 +17,9 @@ ShadowstepEnabled: true
 VeinmineEnabled: true
 WideEnabled: true
 
+#Set the max level vanilla enchants can become using the plugin
+MaxEnchantLevel: 10
+
 #Choose whether you want to enable the smelting from
 #rotten flesh to leather for easier creation of books
 LeatherSmeltEnabled: true
