@@ -28,7 +28,7 @@ The follow range decreases as follows:
 Level 1: 12 blocks, Level 2: 8 blocks, Level 3: 6 blocks, Level 4: 4 blocks, Level 5: 2 blocks
 
 ## Wandering trader
-The wandering trader now has a chance to spawn with a custom enchantment book as trade
+The wandering trader now has a chance to spawn with a custom enchantment book as trade. You can disable this in the config
 
 ## Custom recipes
 Added the possibility to smelt rotten flesh to leather in a furnace or smoker. You can disable this in the config
