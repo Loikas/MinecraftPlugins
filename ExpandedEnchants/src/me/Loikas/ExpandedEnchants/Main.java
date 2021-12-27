@@ -19,8 +19,8 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import Inventories.InventoryManager;
 import me.Loikas.ExpandedEnchants.Commands.*;
+import me.Loikas.ExpandedEnchants.Inventories.InventoryManager;
 
 public class Main extends JavaPlugin
 {
@@ -121,6 +121,7 @@ public class Main extends JavaPlugin
 				SmokingRecipe leathersmoke = new SmokingRecipe(NamespacedKey.minecraft("ee_recipe_leather_smoke"), new ItemStack(Material.LEATHER, 1), Material.ROTTEN_FLESH, 1.1f, 50);
 				Bukkit.getServer().addRecipe(leathersmoke);
 			}
+		if(getPlugin().getConfig().getBoolean("AntigravityEnabled"))
 		{
 			ShapedRecipe AntiGravity = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_antigravity"), itemManager.CreateCustomBook(CustomEnchantsManager.ANTIGRAVITY, 1));
 			AntiGravity.shape(" H ", "FBS", " L ");
@@ -132,6 +133,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(AntiGravity, new Integer[] { 0, 1, 0, 48, 1, 36, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(AntiGravity);	
 		}
+		if(getPlugin().getConfig().getBoolean("AutosmeltEnabled"))
 		{
 			ShapedRecipe AutoSmelt = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_autosmelt"), itemManager.CreateCustomBook(CustomEnchantsManager.AUTOSMELT, 1));
 			AutoSmelt.shape(" M ", "FAB", " L ");
@@ -143,6 +145,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(AutoSmelt, new Integer[] { 0, 40, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(AutoSmelt);
 		}
+		if(getPlugin().getConfig().getBoolean("BeheadingEnabled"))
 		{
 			ShapedRecipe Beheading = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_beheading"), itemManager.CreateCustomBook(CustomEnchantsManager.BEHEADING, 1));
 			Beheading.shape(" M ", "FAF", " L ");
@@ -153,6 +156,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Beheading, new Integer[] { 0, 2, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Beheading);
 		}
+		if(getPlugin().getConfig().getBoolean("DeflectEnabled"))
 		{
 			ShapedRecipe Deflect = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_deflect"), itemManager.CreateCustomBook(CustomEnchantsManager.DEFLECT, 1));
 			Deflect.shape(" M ", "FAB", " L ");
@@ -164,6 +168,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Deflect, new Integer[] { 0, 40, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Deflect);
 		}
+		if(getPlugin().getConfig().getBoolean("DirectEnabled"))
 		{
 			ShapedRecipe Direct = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_direct"), itemManager.CreateCustomBook(CustomEnchantsManager.DIRECT, 1));
 			Direct.shape(" M ", "FAB", " L ");
@@ -175,6 +180,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Direct, new Integer[] { 0, 20, 0, 32, 1, 16, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Direct);
 		}
+		if(getPlugin().getConfig().getBoolean("ExperienceboostEnabled"))
 		{
 			ShapedRecipe ExpBoost = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_expboost"), itemManager.CreateCustomBook(CustomEnchantsManager.EXP_BOOST, 1));
 			ExpBoost.shape(" M ", "FAB", " L ");
@@ -219,6 +225,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(HeavensLightness, new Integer[] { 0, 1, 0, 40, 1, 40, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(HeavensLightness);
 		}
+		if(getPlugin().getConfig().getBoolean("IcyEnabled"))
 		{
 			ShapedRecipe Icy = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_icy"), itemManager.CreateCustomBook(CustomEnchantsManager.ICY, 1));
 			Icy.shape(" M ", "FAB", " L ");
@@ -230,6 +237,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Icy, new Integer[] { 0, 1, 0, 40, 1, 4, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Icy);
 		}
+		if(getPlugin().getConfig().getBoolean("LavawalkerEnabled"))
 		{
 			ShapedRecipe LavaWalker = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lavawalker"), itemManager.CreateCustomBook(CustomEnchantsManager.LAVA_WALKER, 1));
 			LavaWalker.shape(" M ", "FAB", " L ");
@@ -252,6 +260,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Leaping, new Integer[] { 0, 1, 0, 24, 1, 12, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(Leaping);
 		}
+		if(getPlugin().getConfig().getBoolean("LifestealEnabled"))
 		{
 			ShapedRecipe Lifesteal = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lifesteal"), itemManager.CreateCustomBook(CustomEnchantsManager.LIFESTEAL, 1));
 			Lifesteal.shape(" M ", "FAB", " L ");
@@ -307,6 +316,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Unbreakable, new Integer[] { 0, 1, 0, 40, 1, 40, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(Unbreakable);
 		}
+		if(getPlugin().getConfig().getBoolean("VeinmineEnabled"))
 		{
 			ShapedRecipe Veinmine = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_veinmine"), itemManager.CreateCustomBook(CustomEnchantsManager.VEINMINE, 1));
 			Veinmine.shape("RMS", "FAB", "NLG");
@@ -322,6 +332,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Veinmine, new Integer[] { 64, 48, 32, 1, 1, 24, 4, 8, 16 }));
 			Bukkit.getServer().addRecipe(Veinmine);
 		}
+		if(getPlugin().getConfig().getBoolean("WideEnabled"))
 		{
 			ShapedRecipe Wide = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_wide"), itemManager.CreateCustomBook(CustomEnchantsManager.WIDE, 1));
 			Wide.shape("RMS", "AAA", "NLG");
@@ -335,6 +346,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Wide, new Integer[] { 64, 30, 64, 1, 1, 1, 64, 16, 64 }));
 			Bukkit.getServer().addRecipe(Wide);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack1"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -346,6 +358,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack2"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -357,6 +370,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack3"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -368,6 +382,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack4"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -379,6 +394,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack5"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -390,6 +406,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("LumberjackEnabled"))
 		{
 			ShapedRecipe Lumberjack = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_lumberjack6"), itemManager.CreateCustomBook(CustomEnchantsManager.LUMBERJACK, 1));
 			Lumberjack.shape(" M ", "FAB", " L ");
@@ -401,6 +418,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lumberjack, new Integer[] { 0, 64, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lumberjack);
 		}
+		if(getPlugin().getConfig().getBoolean("FeedingmoduleEnabled"))
 		{
 			ShapedRecipe FeedingModule = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_feedingmodule"), itemManager.CreateCustomBook(CustomEnchantsManager.FEEDINGMODULE, 1));
 			FeedingModule.shape(" M ", "FAB", " L ");
@@ -412,6 +430,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(FeedingModule, new Integer[] { 0, 30, 0, 30, 1, 30, 0, 30, 0 }));
 			Bukkit.getServer().addRecipe(FeedingModule);
 		}
+		if(getPlugin().getConfig().getBoolean("ReplantingEnabled"))
 		{
 			ShapedRecipe Replanting = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_replanting"), itemManager.CreateCustomBook(CustomEnchantsManager.REPLANTING, 1));
 			Replanting.shape(" M ", "FAB", " L ");
@@ -423,6 +442,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Replanting, new Integer[] { 0, 1, 0, 32, 1, 32, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Replanting);
 		}
+		if(getPlugin().getConfig().getBoolean("ShadowstepEnabled"))
 		{
 			ShapedRecipe ShadowStep = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_shadowstep"), itemManager.CreateCustomBook(CustomEnchantsManager.SHADOWSTEP, 1));
 			ShadowStep.shape(" M ", "FAB", " L ");

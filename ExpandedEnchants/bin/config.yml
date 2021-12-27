@@ -1,6 +1,6 @@
 #Choose which custom enchants to enable
-#They will still be obtainable but wont do anything when 
-#you put them on an item
+#They will still remain on the items but wont do anything
+#To disable the crafting recipes you have to reload the server
 AntigravityEnabled: true
 AutosmeltEnabled: true
 BeheadingEnabled: true
