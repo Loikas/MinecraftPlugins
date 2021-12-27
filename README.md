@@ -19,10 +19,10 @@ using the interactive gui you get with /ee recipes
 A big config to configure the plugin exactly as you like it
 
 ## Two new custom enchants
-- Replanting
+- Replanting:
 Put on a hoe to farm your crops much easier, when you right click on a full grown crop
 it will immediately plant a new one. Compatible with direct for an even better farming experience
-- Shadow Step
+- Shadow Step:
 Put on your boots to be more silent and make it harder for hostile mobs to hear you
 The follow range decreases as follows:
 Level 1: 12 blocks, Level 2: 8 blocks, Level 3: 6 blocks, Level 4: 4 blocks, Level 5: 2 blocks
