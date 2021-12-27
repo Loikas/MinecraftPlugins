@@ -192,6 +192,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(ExpBoost, new Integer[] { 0, 36, 0, 64, 1, 64, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(ExpBoost);
 		}
+		if(getPlugin().getConfig().getBoolean("EyesofowlEnabled"))
 		{
 			ShapedRecipe OwlEyes = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_owleyes"), itemManager.CreateCustomBook(CustomEnchantsManager.OWLEYES, 1));
 			OwlEyes.shape(" M ", "FAB", " L ");
@@ -203,6 +204,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(OwlEyes, new Integer[] { 0, 1, 0, 25, 1, 25, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(OwlEyes);
 		}
+		if(getPlugin().getConfig().getBoolean("HealthboostEnabled"))
 		{
 			ShapedRecipe HealthBoost = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_healthboost"), itemManager.CreateCustomBook(CustomEnchantsManager.HEALTHBOOST, 1));
 			HealthBoost.shape(" M ", "FAB", " L ");
@@ -214,6 +216,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(HealthBoost, new Integer[] { 0, 1, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(HealthBoost);
 		}
+		if(getPlugin().getConfig().getBoolean("HeavenslightnessEnabled"))
 		{
 			ShapedRecipe HeavensLightness = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_heavenslightness"), itemManager.CreateCustomBook(CustomEnchantsManager.HEAVENSLIGHTNESS, 1));
 			HeavensLightness.shape(" M ", "FAB", " L ");
@@ -249,6 +252,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(LavaWalker, new Integer[] { 0, 6, 0, 64, 1, 64, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(LavaWalker);
 		}
+		if(getPlugin().getConfig().getBoolean("LeapingEnabled"))
 		{
 			ShapedRecipe Leaping = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_leaping"), itemManager.CreateCustomBook(CustomEnchantsManager.LEAPING, 1));
 			Leaping.shape(" M ", "FAB", " L ");
@@ -272,6 +276,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Lifesteal, new Integer[] { 0, 1, 0, 1, 1, 1, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Lifesteal);
 		}
+		if(getPlugin().getConfig().getBoolean("StonefistsEnabled"))
 		{
 			ShapedRecipe StoneFists = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_stonefists"), itemManager.CreateCustomBook(CustomEnchantsManager.STONEFISTS, 1));
 			StoneFists.shape(" M ", "FAB", " L ");
@@ -283,6 +288,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(StoneFists, new Integer[] { 0, 1, 0, 64, 1, 64, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(StoneFists);
 		}
+		if(getPlugin().getConfig().getBoolean("ThermalplatingEnabled"))
 		{
 			ShapedRecipe ThermalPlating = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_thermalplating"), itemManager.CreateCustomBook(CustomEnchantsManager.THERMALPLATING, 1));
 			ThermalPlating.shape(" M ", "FAB", " L ");
@@ -294,6 +300,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(ThermalPlating, new Integer[] { 0, 1, 0, 5, 1, 50, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(ThermalPlating);
 		}
+		if(getPlugin().getConfig().getBoolean("TravelerEnabled"))
 		{
 			ShapedRecipe Traveler = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_traveler"), itemManager.CreateCustomBook(CustomEnchantsManager.TRAVELER, 1));
 			Traveler.shape(" M ", "FAB", " L ");
@@ -305,6 +312,7 @@ public class Main extends JavaPlugin
 			customRecipes.add(new CustomEnchantmentRecipe(Traveler, new Integer[] { 0, 1, 0, 24, 1, 24, 0, 1, 0 }));
 			Bukkit.getServer().addRecipe(Traveler);
 		}
+		if(getPlugin().getConfig().getBoolean("UnbreakableEnabled"))
 		{
 			ShapedRecipe Unbreakable = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_unbreakable"), itemManager.CreateCustomBook(CustomEnchantsManager.NOBREAKABLE, 1));
 			Unbreakable.shape(" M ", "FAB", " L ");
