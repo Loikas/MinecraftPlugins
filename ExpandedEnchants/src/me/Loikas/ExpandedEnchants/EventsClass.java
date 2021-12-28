@@ -116,6 +116,7 @@ public class EventsClass implements Listener
 		ItemStack ss = event.getInventory().getItem(1);
 		if(fs == null || ss == null) return;
 		event.getInventory().setRepairCost(5);
+		isModified = false;
 		HandleResourceEnchants(fs, ss, event);
 		HandleSameItemUpgrades(fs, ss, event);
 		HandleCustomEnchantBooks(fs, ss, event);
@@ -1160,6 +1161,7 @@ public class EventsClass implements Listener
 
 
 	public boolean removeLastEnchant = false;
+	public boolean isModified = false;
 	@SuppressWarnings("deprecation")
 	public void HandleDisenchant(ItemStack fs, ItemStack ss, PrepareAnvilEvent e) {
 		if(ss.getType() != Material.BOOK) return;
@@ -1177,6 +1179,7 @@ public class EventsClass implements Listener
 			meta.removeStoredEnchant(removeEnchant);
 			removeLastEnchant = true;
 			e.setResult(resultBook);
+			isModified = true;
 		}
 		else 
 		{
@@ -1195,6 +1198,7 @@ public class EventsClass implements Listener
 				resultBook.setItemMeta(customResultMeta);
 				removeLastEnchant = true;
 				e.setResult(resultBook);
+				isModified = true;
 			}
 			else {
 				resultMeta.addStoredEnchant(removeEnchant, fs.getEnchantmentLevel(removeEnchant), true);
@@ -1202,6 +1206,7 @@ public class EventsClass implements Listener
 				resultMeta.setDisplayName(e.getInventory().getRenameText());
 				resultBook.setItemMeta(resultMeta);
 				e.setResult(resultBook);
+				isModified = true;
 			}
 		}
 	}
@@ -1218,6 +1223,7 @@ public class EventsClass implements Listener
 			meta.setDisplayName(e.getInventory().getRenameText());
 			resultItem.setItemMeta(meta);
 			e.setResult(resultItem);
+			isModified = true;
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 				e.getInventory().setRepairCost(1);
 				for(HumanEntity he : e.getViewers()) {
@@ -1237,7 +1243,15 @@ public class EventsClass implements Listener
 			int MaxLevel = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
 			if(meta.hasStoredEnchant(ench)) 
 			{
-				if(ench == Enchantment.LURE) 
+				if(ench.getMaxLevel() == 1) meta.addStoredEnchant(ench, 1, false);
+				else if(ench == Enchantment.LURE) 
+				{
+					if(meta.getStoredEnchantLevel(ench) < (MaxLevel < 3 ? MaxLevel : 3)) 
+					{
+						meta.addStoredEnchant(ench, meta.getStoredEnchantLevel(ench) + 1, true);
+					}
+				}
+				else if(ench == Enchantment.DEPTH_STRIDER) 
 				{
 					if(meta.getStoredEnchantLevel(ench) < (MaxLevel < 3 ? MaxLevel : 3)) 
 					{
@@ -1261,7 +1275,9 @@ public class EventsClass implements Listener
 			}
 			meta.setDisplayName(e.getInventory().getRenameText());
 			resultItem.setItemMeta(meta);
+			if(resultItem.equals(fs)) resultItem = null;
 			e.setResult(resultItem);
+			isModified = true;
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 				e.getInventory().setRepairCost((meta.getStoredEnchantLevel(ench) + 1) * (meta.getStoredEnchantLevel(ench) + 1));
 				for(HumanEntity he : e.getViewers()) {
@@ -1290,9 +1306,11 @@ public class EventsClass implements Listener
 			if(fs.getItemMeta().hasEnchant(item)) {
 				if(meta.getStoredEnchantLevel(item) == itemMeta.getEnchantLevel(item)) {
 					int MaxLvl = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
-					if(item == Enchantment.QUICK_CHARGE) if(itemMeta.getEnchantLevel(item) < (MaxLvl < 5 ? MaxLvl : 5)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
-					else if(item == Enchantment.LURE) if(itemMeta.getEnchantLevel(item) < (MaxLvl < 3 ? MaxLvl : 3)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
-					else if(itemMeta.getEnchantLevel(item) < MaxLvl) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);
+					if(item.getMaxLevel() == 1);
+					else if(item == Enchantment.QUICK_CHARGE) {if(itemMeta.getEnchantLevel(item) < (MaxLvl < 5 ? MaxLvl : 5)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);}
+					else if(item == Enchantment.LURE) {if(itemMeta.getEnchantLevel(item) < (MaxLvl < 3 ? MaxLvl : 3)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);}
+					else if(item == Enchantment.DEPTH_STRIDER) { if(itemMeta.getEnchantLevel(item) < (MaxLvl < 3 ? MaxLvl : 3)) resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);}
+					else if(itemMeta.getEnchantLevel(item) < MaxLvl) { resultMeta.addEnchant(item, itemMeta.getEnchantLevel(item) + 1, true);}
 				}
 				if(meta.getStoredEnchantLevel(item) > itemMeta.getEnchantLevel(item)) {
 					resultMeta.addEnchant(item, meta.getStoredEnchantLevel(item), true);
@@ -1306,13 +1324,10 @@ public class EventsClass implements Listener
 			}
 			resultMeta.setDisplayName(e.getInventory().getRenameText());
 			resultItem.setItemMeta(resultMeta);
-
-
-
-
 		}	
 		if(fs.equals(resultItem)) resultItem = null;
 		e.setResult(resultItem);
+		isModified = true;
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 			e.getInventory().setRepairCost(5);
 			for(HumanEntity he : e.getViewers()) {
@@ -1341,6 +1356,7 @@ public class EventsClass implements Listener
 			meta.setDisplayName(e.getInventory().getRenameText());
 			item.setItemMeta(meta);
 			e.setResult(item);
+			isModified = true;
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 				e.getInventory().setRepairCost(5);
 				for(HumanEntity he : e.getViewers()) {
@@ -1363,10 +1379,14 @@ public class EventsClass implements Listener
 
 		for(Enchantment item : ssEnchs) {
 			if(resultMeta.hasStoredEnchant(item)) {
-				if(item.getName() == "QUICK_CHARGE" && (resultMeta.getStoredEnchantLevel(item) == 5 || ssMeta.getStoredEnchantLevel(item) == 5)) {
+				if(item.getMaxLevel() == 1) resultMeta.addStoredEnchant(item, 1, false);
+				else if(item.equals(Enchantment.QUICK_CHARGE) && (resultMeta.getStoredEnchantLevel(item) == 5 || ssMeta.getStoredEnchantLevel(item) == 5)) {
 					resultMeta.addStoredEnchant(item, 5, true);
 				}
-				else if(item.getName() == "LURE" && (resultMeta.getStoredEnchantLevel(item) == 3 || ssMeta.getStoredEnchantLevel(item) == 3)) {
+				else if(item.equals(Enchantment.LURE) && (resultMeta.getStoredEnchantLevel(item) == 3 || ssMeta.getStoredEnchantLevel(item) == 3)) {
+					resultMeta.addStoredEnchant(item, 3, true);
+				}
+				else if(item.equals(Enchantment.DEPTH_STRIDER) && (resultMeta.getStoredEnchantLevel(item) == 3 || ssMeta.getStoredEnchantLevel(item) == 3)) {
 					resultMeta.addStoredEnchant(item, 3, true);
 				}
 				else if(resultMeta.getStoredEnchantLevel(item) == 10 || ssMeta.getStoredEnchantLevel(item) == 10) {
@@ -1391,6 +1411,7 @@ public class EventsClass implements Listener
 		resultItem.setItemMeta(resultMeta);
 		if(resultItem.equals(fs)) resultItem = null;
 		e.setResult(resultItem);
+		isModified = true;
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 			e.getInventory().setRepairCost(5);
 			for(HumanEntity he : e.getViewers()) {
@@ -1453,6 +1474,7 @@ public class EventsClass implements Listener
 				resultItem.setItemMeta(itemMeta);
 			}
 			e.setResult(resultItem);
+			isModified = true;
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 				e.getInventory().setRepairCost(10);
 				for(HumanEntity he : e.getViewers()) {
@@ -1504,6 +1526,7 @@ public class EventsClass implements Listener
 			resultItem.setItemMeta(itemMeta);
 		}
 		e.setResult(resultItem);
+		isModified = true;
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 			e.getInventory().setRepairCost(10);
 			for(HumanEntity he : e.getViewers()) {
@@ -1564,8 +1587,10 @@ public class EventsClass implements Listener
 					if(ssLevel > fsLevel) resultItem.addUnsafeEnchantment(enc, ssLevel);
 					if(ssLevel == fsLevel) {
 						int Mxlvl = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
-						if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.LURE)) continue;
-						else if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.QUICK_CHARGE)) continue;
+						if(enc.getMaxLevel() == 1) continue;
+						else if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.LURE)) continue;
+						else if(ssLevel == (Mxlvl < 3 ? Mxlvl : 3) && enc.equals(Enchantment.DEPTH_STRIDER)) continue;
+						else if(ssLevel == (Mxlvl < 5 ? Mxlvl : 5) && enc.equals(Enchantment.QUICK_CHARGE)) continue;
 						else if(ssLevel == Mxlvl) continue;
 						else resultItem.addUnsafeEnchantment(enc, ssLevel + 1);
 					}
@@ -1628,6 +1653,7 @@ public class EventsClass implements Listener
 		}
 		if(resultItem.equals(fs)) resultItem = null;
 		e.setResult(resultItem);
+		isModified = true;
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 			e.getInventory().setRepairCost(5);
 			for(HumanEntity he : e.getViewers()) {
@@ -1650,6 +1676,7 @@ public class EventsClass implements Listener
 			if(fs.getItemMeta().hasEnchant(goal)) {
 				int enchLvl = fs.getItemMeta().getEnchantLevel(goal); 
 				ItemMeta im = fs.getItemMeta();
+				if(goal.getMaxLevel() == 1) return;
 				im.removeEnchant(goal);
 				fs.setItemMeta(im);
 				if(fs.getItemMeta().hasConflictingEnchant(goal)) return;
@@ -1664,8 +1691,9 @@ public class EventsClass implements Listener
 		if(fs.getItemMeta().hasEnchants()) {
 			int MaxLevel = Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel");
 			if(fs.getItemMeta().hasEnchant(goal)) {
-				if((goal == Enchantment.LURE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 3 ? MaxLevel : 3)) || (goal == Enchantment.QUICK_CHARGE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 5 ? MaxLevel : 5))) return;
+				if((goal == Enchantment.DEPTH_STRIDER && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 3 ? MaxLevel : 3)) ||(goal == Enchantment.LURE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 3 ? MaxLevel : 3)) || (goal == Enchantment.QUICK_CHARGE && fs.getItemMeta().getEnchantLevel(goal) == (MaxLevel < 5 ? MaxLevel : 5))) return;
 				if(fs.getItemMeta().getEnchantLevel(goal) == Main.getPlugin().getConfig().getInt("MaxVanillaEnchantLevel")) return;
+				if(goal.getMaxLevel() == 1) return;
 			}
 		}
 
@@ -1684,6 +1712,7 @@ public class EventsClass implements Listener
 		result.setItemMeta(meta);
 		e.getInventory().setItem(2, result);
 		e.setResult(result);
+		isModified = true;
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () -> {
 			e.getInventory().setRepairCost(tot * tot);
 			for(HumanEntity he : e.getViewers()) {
@@ -1718,6 +1747,7 @@ public class EventsClass implements Listener
 						AnvilInventory ainv = (AnvilInventory) inv;
 						if(rawSlot == 2)
 						{
+							if(!isModified) return;
 							ItemStack item = event.getCurrentItem();
 							if(item != null)
 							{
@@ -1782,6 +1812,7 @@ public class EventsClass implements Listener
 									}
 									else inv.setContents(new ItemStack[] {null, null, null });
 									player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 1);
+									isModified = false;
 									
 								}
 							}
