@@ -33,6 +33,7 @@ MaxVanillaEnchantLevel: 10
 LeatherSmeltEnabled: true
 
 #Percentage chance that the wandering trader spawns with a custom enchant offer
+#Set to 0 for no special offers
 WanderingTraderChance: 20
 
 #Set the amount of emeralds the deflect enchant uses every time it deflects damage

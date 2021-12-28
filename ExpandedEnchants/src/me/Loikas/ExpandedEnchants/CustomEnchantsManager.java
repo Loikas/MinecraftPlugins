@@ -81,14 +81,14 @@ public class CustomEnchantsManager
 		new StringList(new String[] { "Places a block of basalt", "under you every time you walk", "over lava" }),
 		new StringList(new String[] { "Always have a jump boost effect", "Max level is 3" }),
 		new StringList(new String[] { "Steal some of the hearts your enemy had", "Half a heart per level", "Max level is 3"}),
-		new StringList(new String[] { "Mine the whole tree when you mine one block"}),
+		new StringList(new String[] { "Mine the whole tree when you mine one block", "Each level decreases the food cost"}),
 		new StringList(new String[] { "Whenever you right click a full grown crop", "it automatically replants it" }),
 		new StringList(new String[] { "Makes it harder for mobs to hear you", "Decreases follow distance" }),
 		new StringList(new String[] { "Increase your attack damage significantly", "Max level is 3" }),
 		new StringList(new String[] { "Get permanent fire resistance", "BUT ONLY IF EVERY ARMOR PIECE", "HAS THE ENCHANT" }),
 		new StringList(new String[] { "Get a permanent speed boost", "Max level is 3" }),
 		new StringList(new String[] { "Makes a tool truely unbreakable"}),
-		new StringList(new String[] { "When you mine one ore", "it mines all" }),
+		new StringList(new String[] { "When you mine one ore", "it mines all" , "Each level decreases the food cost"}),
 		new StringList(new String[] { "Mine 3x3 to make your life easier", "Also works with right clicking on", "hoes, axes and shovels" }),
 	};
 	
@@ -97,7 +97,7 @@ public class CustomEnchantsManager
 		new StringList(new String[] { "- Pickaxes"}),
 		new StringList(new String[] { "- Axes"}),
 		new StringList(new String[] { "- Chestplates"}),
-		new StringList(new String[] { "- Pickaxes", "- Axes", "- Swords", "- Hoes", "- Shears", "- Shovels", "- Tridents", "- Crossbows", "- Bows"}),
+		new StringList(new String[] { "- Pickaxes", "- Axes", "- Swords", "- Hoe's", "- Shears", "- Shovels", "- Tridents", "- Crossbows", "- Bows"}),
 		new StringList(new String[] { "- Helmets"}),
 		new StringList(new String[] { "- Chestplates"}),
 		new StringList(new String[] { "- Helmets"}),
@@ -110,12 +110,12 @@ public class CustomEnchantsManager
 		new StringList(new String[] { "- Axes"}),
 		new StringList(new String[] { "- Hoes"}),
 		new StringList(new String[] { "- Boots"}),
-		new StringList(new String[] { "- Chestplates"}),
+		new StringList(new String[] { "- Chestplates", "- Elytra's"}),
 		new StringList(new String[] { "- Helmets", "- Chestplates", "- Leggings", "- Boots"}),
 		new StringList(new String[] { "- Leggings"}),
 		new StringList(new String[] { "- All items with durability"}),
 		new StringList(new String[] { "- Pickaxes"}),
-		new StringList(new String[] { "- Axes", "- Pickaxes", "- Shovels", "- Hoes", "- Shears"}),
+		new StringList(new String[] { "- Axes", "- Pickaxes", "- Shovels", "- Hoe's", "- Shears"}),
 	};
 	
 	public static ArrayList<Enchantment> custom_enchants = new ArrayList<Enchantment>();
