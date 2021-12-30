@@ -1,0 +1,19 @@
+Changelog expanded enchants
+
+Version 1.1.1 + 
+- Added Soulbound
+- Added Stepping
+- Added Gourmand
+- Added Elemental Protection 
+- Added custom enchant books to end city loot table
+- Added config option to choose if you want to enable the override
+- Added config option for wide normal use
+- Added config option for allowing disenchanting
+- Added config option for allow resource enchanting
+- Added config option for choose resource enchant xp 
+- Added config option to choose the chance that books spawn in end cities
+
+- Fixed recipe menu is now easier to read
+- Fixed error in console
+- Fixed bug with not being able to disenchant
+- Fixed custom enchants showing up in recipe screen when disabled

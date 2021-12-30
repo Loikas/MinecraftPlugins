@@ -6,9 +6,11 @@ AutosmeltEnabled: true
 BeheadingEnabled: true
 DeflectEnabled: true
 DirectEnabled: true
+ElementalprotectionEnabled: true
 EyesofowlEnabled: true
 ExperienceboostEnabled: true
 FeedingmoduleEnabled: true
+GourmandEnabled: true
 HealthboostEnabled: true
 HeavenslightnessEnabled: true
 IcyEnabled: true
@@ -18,6 +20,8 @@ LifestealEnabled: true
 LumberjackEnabled: true
 ReplantingEnabled: true
 ShadowstepEnabled: true
+SoulboundEnabled: true
+SteppingEnabled: true
 StonefistsEnabled: true
 ThermalplatingEnabled: true
 TravelerEnabled: true
@@ -25,8 +29,22 @@ UnbreakableEnabled: true
 VeinmineEnabled: true
 WideEnabled: true
 
+#Choose if the higher than vanilla enchanting is enabled
+EnableVanillaOverride: true
+
 #Set the max level vanilla enchants can become using the plugin
+#Ignore if EnableVanillaOverride is set to false
 MaxVanillaEnchantLevel: 10
+
+#Choose if you want to enable disenchanting
+AllowDisenchanting: true
+
+#Choose if you want to allow resource enchanting
+AllowResourceEnchant: true
+
+#Choose if you want resource enchants to cost xp
+#Ignore when AllowResourceEnchant is set to false
+ResourceEnchantXpEnabled: true
 
 #Choose whether you want to enable the smelting from
 #rotten flesh to leather for easier creation of books
@@ -34,7 +52,11 @@ LeatherSmeltEnabled: true
 
 #Percentage chance that the wandering trader spawns with a custom enchant offer
 #Set to 0 for no special offers
-WanderingTraderChance: 20
+WanderingTraderChance: 30
+
+#Percentage chance that a custom enchant book will spawn in an endcity
+#Set to 0 to make them never spawn
+EndCityChance: 40
 
 #Set the amount of emeralds the deflect enchant uses every time it deflects damage
 DeflectCost: 1
@@ -94,12 +116,11 @@ FeedingModuleFoods:
     - RABBIT_STEW
     - SWEET_BERRIES
     
+#Choose how to activate the wide enchant for mining blocks
+#choose between SNEAKING, STANDING or BOTH
+WideActivationMode: SNEAKING    
+    
 #Choose how to activate the wide enchant, for hoeing farmland,
 #pathing dirt and stripping wood
 #choose between SNEAKING, STANDING or BOTH:
 WideSpecialActionMode: SNEAKING
-    
-    
-    
-    
-    

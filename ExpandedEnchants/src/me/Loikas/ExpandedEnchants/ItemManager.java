@@ -1,11 +1,7 @@
 package me.Loikas.ExpandedEnchants;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -16,11 +12,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
-
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-
-import io.netty.handler.codec.base64.Base64;
 
 
 
@@ -47,6 +38,14 @@ public class ItemManager
 				ItemStack item = new ItemStack(Material.POTION);
 				PotionMeta meta = (PotionMeta) item.getItemMeta();
 				meta.setBasePotionData(new PotionData(PotionType.NIGHT_VISION, true, false));
+				item.setItemMeta(meta);			
+				return item;
+			}
+			case "minecraft:ee_recipe_elemental":
+			{
+				ItemStack item = new ItemStack(Material.POTION);
+				PotionMeta meta = (PotionMeta) item.getItemMeta();
+				meta.setBasePotionData(new PotionData(PotionType.POISON, false, true));
 				item.setItemMeta(meta);			
 				return item;
 			}

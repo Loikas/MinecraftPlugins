@@ -6,9 +6,6 @@ import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.enchantments.Enchantment;
-
-import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 
 public class CustomEnchantsTabCompleter implements TabCompleter
 {
@@ -37,6 +34,7 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			returns.add("antigravity");
 			returns.add("beheading");
 			returns.add("expboost");
+			returns.add("elementalprotection");
 			returns.add("lavawalker");
 			returns.add("traveler");
 			returns.add("leaping");
@@ -45,13 +43,16 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			returns.add("owleyes");
 			returns.add("heavenslightness");
 			returns.add("thermalplating");
+			returns.add("gourmand");
 			returns.add("lifesteal");
 			returns.add("icy");
 			returns.add("deflect");
+			returns.add("stepping");
 			returns.add("veinmine");
 			returns.add("lumberjack");
 			returns.add("wide");
 			returns.add("feedingmodule");
+			returns.add("soulbound");
 			returns.add("shadowstep");
 			returns.add("replanting");
 			return returns;
@@ -59,20 +60,22 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 		
 		if((args[0].equalsIgnoreCase("give") && !args[1].equals("")) || (args[0].equalsIgnoreCase("enchant") && !args[1].equals(""))) {
 			int max = 1;
-			if(args[1].equalsIgnoreCase("beheading")) max = 6;
-			if(args[1].equalsIgnoreCase("expboost")) max = 6;
-			if(args[1].equalsIgnoreCase("traveler")) max = 4;
-			if(args[1].equalsIgnoreCase("healthboost")) max = 6;
-			if(args[1].equalsIgnoreCase("stonefists")) max = 4;
-			if(args[1].equalsIgnoreCase("leaping")) max = 4;
-			if(args[1].equalsIgnoreCase("lifesteal")) max = 4;
-			if(args[1].equalsIgnoreCase("icy")) max = 6;
-			if(args[1].equalsIgnoreCase("deflect")) max = 5;
-			if(args[1].equalsIgnoreCase("lumberjack")) max = 6;
-			if(args[1].equalsIgnoreCase("veinmine")) max = 6;
-			if(args[1].equalsIgnoreCase("shadowstep")) max = 6;
+			if(args[1].equalsIgnoreCase("beheading")) max = 5;
+			if(args[1].equalsIgnoreCase("expboost")) max = 5;
+			if(args[1].equalsIgnoreCase("elementalprotection")) max = 3;
+			if(args[1].equalsIgnoreCase("traveler")) max = 3;
+			if(args[1].equalsIgnoreCase("healthboost")) max = 5;
+			if(args[1].equalsIgnoreCase("stonefists")) max = 3;
+			if(args[1].equalsIgnoreCase("leaping")) max = 3;
+			if(args[1].equalsIgnoreCase("gourmand")) max = 2;
+			if(args[1].equalsIgnoreCase("lifesteal")) max = 3;
+			if(args[1].equalsIgnoreCase("icy")) max = 5;
+			if(args[1].equalsIgnoreCase("deflect")) max = 4;
+			if(args[1].equalsIgnoreCase("lumberjack")) max = 5;
+			if(args[1].equalsIgnoreCase("veinmine")) max = 5;
+			if(args[1].equalsIgnoreCase("shadowstep")) max = 5;
 			
-			for(int i = 1; i < max; i++) returns.add("" + i);
+			for(int i = 1; i <= max; i++) returns.add("" + i);
 			return returns;
 		}
 		
