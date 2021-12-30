@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.Command;
@@ -14,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,8 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
-import me.Loikas.ExpandedEnchants.Inventories.CustomRecipeInventory;
-import me.Loikas.ExpandedEnchants.Inventories.VanillaRecipeInventory;
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandHandler implements CommandExecutor
@@ -58,6 +54,7 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("antigravity")) return GiveCustomBook(CustomEnchantsManager.ANTIGRAVITY, level, player);
 				if(args[1].equalsIgnoreCase("beheading")) return GiveCustomBook(CustomEnchantsManager.BEHEADING, level, player);
 				if(args[1].equalsIgnoreCase("expboost")) return GiveCustomBook(CustomEnchantsManager.EXP_BOOST, level, player);
+				if(args[1].equalsIgnoreCase("elementalprotection")) return GiveCustomBook(CustomEnchantsManager.ELEMENTALPROTECTION, level, player);
 				if(args[1].equalsIgnoreCase("traveler")) return GiveCustomBook(CustomEnchantsManager.TRAVELER, level, player);
 				if(args[1].equalsIgnoreCase("lavawalker")) return GiveCustomBook(CustomEnchantsManager.LAVA_WALKER, level, player);
 				if(args[1].equalsIgnoreCase("healthboost")) return GiveCustomBook(CustomEnchantsManager.HEALTHBOOST, level, player);
@@ -72,8 +69,11 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("lumberjack")) return GiveCustomBook(CustomEnchantsManager.LUMBERJACK, level, player);
 				if(args[1].equalsIgnoreCase("veinmine")) return GiveCustomBook(CustomEnchantsManager.VEINMINE, level, player);
 				if(args[1].equalsIgnoreCase("wide")) return GiveCustomBook(CustomEnchantsManager.WIDE, level, player);
+				if(args[1].equalsIgnoreCase("gourmand")) return GiveCustomBook(CustomEnchantsManager.GOURMAND, level, player);
+				if(args[1].equalsIgnoreCase("stepping")) return GiveCustomBook(CustomEnchantsManager.STEPPING, level, player);
 				if(args[1].equalsIgnoreCase("feedingmodule")) return GiveCustomBook(CustomEnchantsManager.FEEDINGMODULE, level, player);
 				if(args[1].equalsIgnoreCase("shadowstep")) return GiveCustomBook(CustomEnchantsManager.SHADOWSTEP, level, player);
+				if(args[1].equalsIgnoreCase("soulbound")) return GiveCustomBook(CustomEnchantsManager.SOULBOUND, level, player);
 				if(args[1].equalsIgnoreCase("replanting")) return GiveCustomBook(CustomEnchantsManager.REPLANTING, level, player);
 			}
 			
@@ -83,7 +83,7 @@ public class CommandHandler implements CommandExecutor
 					return true;
 				}
 				Main.getPlugin().reloadConfig();
-				sender.sendMessage(ChatColor.LIGHT_PURPLE + "[EE] Config reloaded!");
+				sender.sendMessage(ChatColor.LIGHT_PURPLE + "[EE]" +  ChatColor.WHITE + " Config reloaded!");
 				return true;
 			}
 			
@@ -98,7 +98,9 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("beheading")) return EnchantPlayerItem(CustomEnchantsManager.BEHEADING, level, player);
 				if(args[1].equalsIgnoreCase("expboost")) return EnchantPlayerItem(CustomEnchantsManager.EXP_BOOST, level, player);
 				if(args[1].equalsIgnoreCase("traveler")) return EnchantPlayerItem(CustomEnchantsManager.TRAVELER, level, player);
+				if(args[1].equalsIgnoreCase("gourmand")) return EnchantPlayerItem(CustomEnchantsManager.GOURMAND, level, player);
 				if(args[1].equalsIgnoreCase("lavawalker")) return EnchantPlayerItem(CustomEnchantsManager.LAVA_WALKER, level, player);
+				if(args[1].equalsIgnoreCase("elementalprotection")) return EnchantPlayerItem(CustomEnchantsManager.ELEMENTALPROTECTION, level, player);
 				if(args[1].equalsIgnoreCase("healthboost")) return EnchantPlayerItem(CustomEnchantsManager.HEALTHBOOST, level, player);
 				if(args[1].equalsIgnoreCase("stonefists")) return EnchantPlayerItem(CustomEnchantsManager.STONEFISTS, level, player);
 				if(args[1].equalsIgnoreCase("leaping")) return EnchantPlayerItem(CustomEnchantsManager.LEAPING, level, player);
@@ -110,8 +112,10 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("deflect")) return EnchantPlayerItem(CustomEnchantsManager.DEFLECT, level, player);
 				if(args[1].equalsIgnoreCase("lumberjack")) return EnchantPlayerItem(CustomEnchantsManager.LUMBERJACK, level, player);
 				if(args[1].equalsIgnoreCase("veinmine")) return EnchantPlayerItem(CustomEnchantsManager.VEINMINE, level, player);
+				if(args[1].equalsIgnoreCase("stepping")) return EnchantPlayerItem(CustomEnchantsManager.STEPPING, level, player);
 				if(args[1].equalsIgnoreCase("wide")) return EnchantPlayerItem(CustomEnchantsManager.WIDE, level, player);
 				if(args[1].equalsIgnoreCase("feedingmodule")) return EnchantPlayerItem(CustomEnchantsManager.FEEDINGMODULE, level, player);
+				if(args[1].equalsIgnoreCase("soulbound")) return EnchantPlayerItem(CustomEnchantsManager.SOULBOUND, level, player);
 				if(args[1].equalsIgnoreCase("shadowstep")) return EnchantPlayerItem(CustomEnchantsManager.SHADOWSTEP, level, player);
 				if(args[1].equalsIgnoreCase("replanting")) return EnchantPlayerItem(CustomEnchantsManager.REPLANTING, level, player);
 				
@@ -120,6 +124,7 @@ public class CommandHandler implements CommandExecutor
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	public boolean EnchantPlayerItem(Enchantment ench, int level, Player sender) {
 		if(!sender.hasPermission("ee.command.enchant")) {
 			sender.sendMessage(ChatColor.RED + "You don't have permission for this command!");

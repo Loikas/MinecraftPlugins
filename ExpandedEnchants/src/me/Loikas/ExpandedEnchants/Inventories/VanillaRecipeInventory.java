@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -21,18 +20,18 @@ public class VanillaRecipeInventory implements InventoryHolder
 	public Inventory inv;
 		
 	public VanillaRecipeInventory(VanillaEnchantmentRecipe recipe, String name) {
-		Enchantment ench = recipe.ench;
-		inv = Bukkit.createInventory(null, 45, name);
+		inv = Bukkit.createInventory(null, 27, name);
 		ChangeRecipe(recipe);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void ChangeRecipe(VanillaEnchantmentRecipe recipe) {
 		ItemStack bench = new ItemStack(Material.ANVIL);
 		ItemMeta benchMeta = bench.getItemMeta();
 		benchMeta.setDisplayName("§b§lAnvil");
 		benchMeta.setLore(Collections.singletonList("§fHas to be crafted in an anvil."));
 		bench.setItemMeta(benchMeta);
-		inv.setItem(21, bench);
+		inv.setItem(12, bench);
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) item.getItemMeta();
 		meta.setOwner("MHF_ArrowLeft");
@@ -48,13 +47,13 @@ public class VanillaRecipeInventory implements InventoryHolder
 		lore.add("§fon the enchantment.");
 		bookMeta.setLore(lore);
 		book.setItemMeta(bookMeta);
-		inv.setItem(20, book);
-		inv.setItem(22, new ItemStack(recipe.mat, recipe.amount));
+		inv.setItem(11, book);
+		inv.setItem(13, new ItemStack(recipe.mat, recipe.amount));
 		ItemStack result = new ItemStack(Material.ENCHANTED_BOOK, 1);
 		EnchantmentStorageMeta resultmeta = (EnchantmentStorageMeta) result.getItemMeta();
 		resultmeta.addStoredEnchant(recipe.ench, 1, true);
 		result.setItemMeta(resultmeta);
-		inv.setItem(24, result);		
+		inv.setItem(15, result);		
 	}
 	
 	@Override

@@ -1,8 +1,6 @@
 package me.Loikas.ExpandedEnchants;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.inventory.ItemStack;
 
 public class DoubleItemStack

@@ -5,20 +5,13 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.SmokingRecipe;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-
 import me.Loikas.ExpandedEnchants.Commands.*;
 import me.Loikas.ExpandedEnchants.Inventories.InventoryManager;
 
@@ -94,9 +87,11 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.BEHEADING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.DEFLECT);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.DIRECT);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.ELEMENTALPROTECTION);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.OWLEYES);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.EXP_BOOST);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.FEEDINGMODULE);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.GOURMAND);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.HEALTHBOOST);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.HEAVENSLIGHTNESS);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.ICY);
@@ -106,6 +101,8 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.LUMBERJACK);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.REPLANTING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SHADOWSTEP);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SOULBOUND);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STEPPING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STONEFISTS);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.THERMALPLATING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.TRAVELER);
@@ -131,6 +128,43 @@ public class Main extends JavaPlugin
 			AntiGravity.setIngredient('S', Material.AMETHYST_SHARD);
 			AntiGravity.setIngredient('L', Material.LAPIS_LAZULI);
 			customRecipes.add(new CustomEnchantmentRecipe(AntiGravity, new Integer[] { 0, 1, 0, 48, 1, 36, 0, 16, 0 }));
+			Bukkit.getServer().addRecipe(AntiGravity);	
+		}
+		if(getPlugin().getConfig().getBoolean("SteppingEnabled"))
+		{
+			ShapedRecipe AntiGravity = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_stepping"), itemManager.CreateCustomBook(CustomEnchantsManager.STEPPING, 1));
+			AntiGravity.shape(" H ", "FBS", " L ");
+			AntiGravity.setIngredient('H', Material.DIAMOND_HORSE_ARMOR);
+			AntiGravity.setIngredient('F', Material.QUARTZ_STAIRS);
+			AntiGravity.setIngredient('B', Material.BOOK);
+			AntiGravity.setIngredient('S', Material.PRISMARINE_STAIRS);
+			AntiGravity.setIngredient('L', Material.LAPIS_LAZULI);
+			customRecipes.add(new CustomEnchantmentRecipe(AntiGravity, new Integer[] { 0, 1, 0, 16, 1, 16, 0, 16, 0 }));
+			Bukkit.getServer().addRecipe(AntiGravity);	
+		}
+		if(getPlugin().getConfig().getBoolean("GourmandEnabled"))
+		{
+			ShapedRecipe AntiGravity = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_gourmand"), itemManager.CreateCustomBook(CustomEnchantsManager.GOURMAND, 1));
+			AntiGravity.shape(" H ", "FBS", " L ");
+			AntiGravity.setIngredient('H', Material.ENCHANTED_GOLDEN_APPLE);
+			AntiGravity.setIngredient('F', Material.COOKED_BEEF);
+			AntiGravity.setIngredient('B', Material.BOOK);
+			AntiGravity.setIngredient('S', Material.HONEY_BOTTLE);
+			AntiGravity.setIngredient('L', Material.LAPIS_LAZULI);
+			customRecipes.add(new CustomEnchantmentRecipe(AntiGravity, new Integer[] { 0, 1, 0, 64, 1, 16, 0, 16, 0 }));
+			Bukkit.getServer().addRecipe(AntiGravity);	
+		}
+		if(getPlugin().getConfig().getBoolean("SoulboundEnabled"))
+		{
+			ShapedRecipe AntiGravity = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_soulbound"), itemManager.CreateCustomBook(CustomEnchantsManager.SOULBOUND, 1));
+			AntiGravity.shape("XHX", "FBS", "XLX");
+			AntiGravity.setIngredient('H', Material.TOTEM_OF_UNDYING);
+			AntiGravity.setIngredient('F', Material.CHAIN);
+			AntiGravity.setIngredient('B', Material.BOOK);
+			AntiGravity.setIngredient('S', Material.NAME_TAG);
+			AntiGravity.setIngredient('L', Material.LAPIS_LAZULI);
+			AntiGravity.setIngredient('X', Material.SHULKER_SHELL);
+			customRecipes.add(new CustomEnchantmentRecipe(AntiGravity, new Integer[] { 6, 1, 6, 32, 1, 16, 6, 16, 6 }));
 			Bukkit.getServer().addRecipe(AntiGravity);	
 		}
 		if(getPlugin().getConfig().getBoolean("AutosmeltEnabled"))
@@ -179,6 +213,18 @@ public class Main extends JavaPlugin
 			Direct.setIngredient('L', Material.LAPIS_LAZULI);
 			customRecipes.add(new CustomEnchantmentRecipe(Direct, new Integer[] { 0, 20, 0, 32, 1, 16, 0, 16, 0 }));
 			Bukkit.getServer().addRecipe(Direct);
+		}
+		if(getPlugin().getConfig().getBoolean("ElementalprotectionEnabled"))
+		{
+			ShapedRecipe Elemental = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_elemental"), itemManager.CreateCustomBook(CustomEnchantsManager.ELEMENTALPROTECTION, 1));
+			Elemental.shape(" M ", "FAB", " L ");
+			Elemental.setIngredient('M', Material.POTION);
+			Elemental.setIngredient('F', Material.END_CRYSTAL);
+			Elemental.setIngredient('A', Material.BOOK);
+			Elemental.setIngredient('B', Material.WITHER_ROSE);
+			Elemental.setIngredient('L', Material.NETHER_STAR);
+			customRecipes.add(new CustomEnchantmentRecipe(Elemental, new Integer[] { 0, 1, 0, 5, 1, 5, 0, 1, 0 }));
+			Bukkit.getServer().addRecipe(Elemental);
 		}
 		if(getPlugin().getConfig().getBoolean("ExperienceboostEnabled"))
 		{

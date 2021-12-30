@@ -3,7 +3,6 @@ package me.Loikas.ExpandedEnchants;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -27,9 +26,11 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("BeheadingEnabled")) enchs.add(CustomEnchantsManager.BEHEADING);
 		if(Main.getPlugin().getConfig().getBoolean("DeflectEnabled")) enchs.add(CustomEnchantsManager.DEFLECT);
 		if(Main.getPlugin().getConfig().getBoolean("DirectEnabled")) enchs.add(CustomEnchantsManager.DIRECT);
+		if(Main.getPlugin().getConfig().getBoolean("ElementalprotectionEnabled")) enchs.add(CustomEnchantsManager.ELEMENTALPROTECTION);
 		if(Main.getPlugin().getConfig().getBoolean("EyesofowlEnabled")) enchs.add(CustomEnchantsManager.OWLEYES);
 		if(Main.getPlugin().getConfig().getBoolean("ExperienceboostEnabled")) enchs.add(CustomEnchantsManager.EXP_BOOST);
 		if(Main.getPlugin().getConfig().getBoolean("FeedingmoduleEnabled")) enchs.add(CustomEnchantsManager.FEEDINGMODULE);
+		if(Main.getPlugin().getConfig().getBoolean("GourmandEnabled")) enchs.add(CustomEnchantsManager.GOURMAND);
 		if(Main.getPlugin().getConfig().getBoolean("HealthboostEnabled")) enchs.add(CustomEnchantsManager.HEALTHBOOST);
 		if(Main.getPlugin().getConfig().getBoolean("HeavenslightnessEnabled")) enchs.add(CustomEnchantsManager.HEAVENSLIGHTNESS);
 		if(Main.getPlugin().getConfig().getBoolean("IcyEnabled")) enchs.add(CustomEnchantsManager.ICY);
@@ -39,6 +40,8 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("LumberjackEnabled")) enchs.add(CustomEnchantsManager.LUMBERJACK);
 		if(Main.getPlugin().getConfig().getBoolean("ReplantingEnabled")) enchs.add(CustomEnchantsManager.REPLANTING);
 		if(Main.getPlugin().getConfig().getBoolean("ShadowstepEnabled")) enchs.add(CustomEnchantsManager.SHADOWSTEP);
+		if(Main.getPlugin().getConfig().getBoolean("SoulboundEnabled")) enchs.add(CustomEnchantsManager.SOULBOUND);
+		if(Main.getPlugin().getConfig().getBoolean("SteppingEnabled")) enchs.add(CustomEnchantsManager.STEPPING);
 		if(Main.getPlugin().getConfig().getBoolean("StonefistsEnabled")) enchs.add(CustomEnchantsManager.STONEFISTS);
 		if(Main.getPlugin().getConfig().getBoolean("ThermalplatingEnabled")) enchs.add(CustomEnchantsManager.THERMALPLATING);
 		if(Main.getPlugin().getConfig().getBoolean("TravelerEnabled")) enchs.add(CustomEnchantsManager.TRAVELER);
@@ -51,23 +54,23 @@ public class Functions
 	public int GetSlot(int i) {
 		switch(i) {
 		case 0:
-			return 11;
-		case 1:
-			return 12;
-		case 2:
-			return 13;
-		case 3:
 			return 20;
-		case 4:
+		case 1:
 			return 21;
-		case 5:
+		case 2:
 			return 22;
-		case 6:
+		case 3:
 			return 29;
-		case 7:
+		case 4:
 			return 30;
-		case 8:
+		case 5:
 			return 31;
+		case 6:
+			return 38;
+		case 7:
+			return 39;
+		case 8:
+			return 40;
 		}
 		return -1;
 	}
@@ -397,6 +400,7 @@ public class Functions
 		return mats;
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	public int GetFoodPoints(Material mat) {
 		switch(mat) {
 		case APPLE: return 4;
