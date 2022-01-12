@@ -1,6 +1,8 @@
 package me.Loikas.ExpandedEnchants.Inventories;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,6 +21,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
+import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import net.md_5.bungee.api.ChatColor;
 
 public class InventoryManager implements Listener
 {
@@ -49,8 +53,16 @@ public class InventoryManager implements Listener
 		meta.setDisplayName("§e§lBack");
 		item.setItemMeta(meta);
 		vanillaChoose.setItem(0, item);
-		customChoose = Bukkit.createInventory(null, 36, "§5§lChoose an enchantment");
+		customChoose = Bukkit.createInventory(null, 45, "§5§lChoose an enchantment");
 		customChoose.setItem(0, item);
+		ItemStack enchBook = new ItemStack(Material.ENCHANTED_BOOK);
+		ItemMeta enchMeta = enchBook.getItemMeta();
+		List<String> lore = new ArrayList<>();
+		lore.add("§fThe recipe for the enchantment book");
+		lore.add("§fneeded in all custom recipes.");
+		enchMeta.setLore(lore);
+		enchBook.setItemMeta(enchMeta);
+		customChoose.setItem(8, enchBook);
 		for(int i = 9; i < 47; i++) {
 			ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
 			EnchantmentStorageMeta bookmeta = (EnchantmentStorageMeta) book.getItemMeta();
@@ -119,12 +131,19 @@ public class InventoryManager implements Listener
 				return;
 			}
 			if(e.getCurrentItem() != null) {
-				ItemStack item = e.getCurrentItem();
-				ItemMeta meta = item.getItemMeta();
-				Enchantment ench = (Enchantment) meta.getEnchants().keySet().toArray()[0];
-				player.closeInventory();
-				customRecipeInv.put(player.getUniqueId(), new CustomRecipeInventory(Main.GetCustomEnchantmentRecipe(ench)));
-				player.openInventory(customRecipeInv.get(player.getUniqueId()).inv);
+				if(e.getSlot() == 8) {
+					player.closeInventory();
+					customRecipeInv.put(player.getUniqueId(), new CustomRecipeInventory(new CustomEnchantmentRecipe(null, null)));
+					player.openInventory(customRecipeInv.get(player.getUniqueId()).inv);
+				}
+				else {
+					ItemStack item = e.getCurrentItem();
+					ItemMeta meta = item.getItemMeta();
+					Enchantment ench = (Enchantment) meta.getEnchants().keySet().toArray()[0];
+					player.closeInventory();
+					customRecipeInv.put(player.getUniqueId(), new CustomRecipeInventory(Main.GetCustomEnchantmentRecipe(ench)));
+					player.openInventory(customRecipeInv.get(player.getUniqueId()).inv);
+				}
 			}
 		}
 		if(vanillaRecipeInv.containsKey(player.getUniqueId())) {

@@ -28,6 +28,7 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 		if(returns.size() > 0) return returns;
 		if(!sender.hasPermission("ee.give") && !sender.hasPermission("ee.command.enchant")) return null;
 		if((args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("enchant")) && args.length <= 2) {
+			returns.add("assassin");
 			returns.add("unbreakable");
 			returns.add("direct");
 			returns.add("autosmelt");
@@ -45,6 +46,8 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			returns.add("thermalplating");
 			returns.add("gourmand");
 			returns.add("lifesteal");
+			returns.add("disarming");
+			returns.add("disruption");
 			returns.add("icy");
 			returns.add("deflect");
 			returns.add("stepping");
@@ -60,6 +63,7 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 		
 		if((args[0].equalsIgnoreCase("give") && !args[1].equals("")) || (args[0].equalsIgnoreCase("enchant") && !args[1].equals(""))) {
 			int max = 1;
+			if(args[1].equalsIgnoreCase("assassin")) max = 3;
 			if(args[1].equalsIgnoreCase("beheading")) max = 5;
 			if(args[1].equalsIgnoreCase("expboost")) max = 5;
 			if(args[1].equalsIgnoreCase("elementalprotection")) max = 3;
@@ -67,6 +71,8 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			if(args[1].equalsIgnoreCase("healthboost")) max = 5;
 			if(args[1].equalsIgnoreCase("stonefists")) max = 3;
 			if(args[1].equalsIgnoreCase("leaping")) max = 3;
+			if(args[1].equalsIgnoreCase("disarming")) max = 4;
+			if(args[1].equalsIgnoreCase("disruption")) max = 3;
 			if(args[1].equalsIgnoreCase("gourmand")) max = 2;
 			if(args[1].equalsIgnoreCase("lifesteal")) max = 3;
 			if(args[1].equalsIgnoreCase("icy")) max = 5;

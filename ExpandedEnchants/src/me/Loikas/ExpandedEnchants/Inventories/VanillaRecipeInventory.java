@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import me.Loikas.ExpandedEnchants.VanillaEnchantmentRecipe;
+import me.Loikas.ExpandedEnchants.Util.VanillaEnchantmentRecipe;
 
 public class VanillaRecipeInventory implements InventoryHolder
 {
