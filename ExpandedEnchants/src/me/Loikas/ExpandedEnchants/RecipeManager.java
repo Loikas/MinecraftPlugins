@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 
+import me.Loikas.ExpandedEnchants.Util.VanillaEnchantmentRecipe;
 
 
 public class RecipeManager

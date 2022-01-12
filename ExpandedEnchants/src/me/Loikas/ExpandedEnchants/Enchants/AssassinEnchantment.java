@@ -8,15 +8,16 @@ import org.bukkit.inventory.ItemStack;
 import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 import me.Loikas.ExpandedEnchants.EventsClass;
 
-public class ShadowStepEnchantment extends Enchantment
+public class AssassinEnchantment extends Enchantment
 {
 	
 	public final String name;
 	public final int maxLvl;
 
-	public ShadowStepEnchantment(String namespace, String name, int lvl)
+	public AssassinEnchantment(String namespace, String name, int lvl)
 	{
 		super(NamespacedKey.minecraft(namespace));
+		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.maxLvl = lvl;
 	}
@@ -31,7 +32,7 @@ public class ShadowStepEnchantment extends Enchantment
 	@Override
 	public boolean conflictsWith(Enchantment arg0)
 	{
-		if(arg0.equals(CustomEnchantsManager.ASSASSIN)) return true;
+		if(arg0.equals(CustomEnchantsManager.SHADOWSTEP)) return true;
 		return false;
 	}
 
@@ -44,30 +45,35 @@ public class ShadowStepEnchantment extends Enchantment
 	@Override
 	public int getMaxLevel()
 	{
+		// TODO Auto-generated method stub
 		return maxLvl;
 	}
 
 	@Override
 	public String getName()
 	{
+		// TODO Auto-generated method stub
 		return name;
 	}
 
 	@Override
 	public int getStartLevel()
 	{
+		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public boolean isCursed()
 	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isTreasure()
 	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 	

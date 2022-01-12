@@ -41,6 +41,14 @@ public class ItemManager
 				item.setItemMeta(meta);			
 				return item;
 			}
+			case "minecraft:ee_recipe_assassin":
+			{
+				ItemStack item = new ItemStack(Material.POTION);
+				PotionMeta meta = (PotionMeta) item.getItemMeta();
+				meta.setBasePotionData(new PotionData(PotionType.INVISIBILITY, true, false));
+				item.setItemMeta(meta);			
+				return item;
+			}
 			case "minecraft:ee_recipe_elemental":
 			{
 				ItemStack item = new ItemStack(Material.POTION);

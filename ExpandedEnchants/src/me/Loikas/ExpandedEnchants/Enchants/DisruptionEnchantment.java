@@ -5,16 +5,15 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 
-import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 import me.Loikas.ExpandedEnchants.EventsClass;
 
-public class ShadowStepEnchantment extends Enchantment
+public class DisruptionEnchantment extends Enchantment
 {
 	
 	public final String name;
 	public final int maxLvl;
 
-	public ShadowStepEnchantment(String namespace, String name, int lvl)
+	public DisruptionEnchantment(String namespace, String name, int lvl)
 	{
 		super(NamespacedKey.minecraft(namespace));
 		this.name = name;
@@ -24,14 +23,17 @@ public class ShadowStepEnchantment extends Enchantment
 	@Override
 	public boolean canEnchantItem(ItemStack arg0)
 	{
-		if(EventsClass.functions.CheckBootsTypes(arg0)) return true;
+		if(EventsClass.functions.CheckSwordTypes(arg0)) return true;
+		if(EventsClass.functions.CheckAxeTypes(arg0)) return true;
 		return false;
 	}
 
 	@Override
 	public boolean conflictsWith(Enchantment arg0)
 	{
-		if(arg0.equals(CustomEnchantsManager.ASSASSIN)) return true;
+		if(arg0.equals(Enchantment.DAMAGE_ARTHROPODS)) return true;
+		if(arg0.equals(Enchantment.DAMAGE_ALL)) return true;
+		if(arg0.equals(Enchantment.DAMAGE_UNDEAD)) return true;
 		return false;
 	}
 

@@ -21,13 +21,20 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Shulker;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,17 +49,21 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.CraftingInventory;
@@ -73,6 +84,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
+import me.Loikas.ExpandedEnchants.Util.AssassinInfo;
+import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import me.Loikas.ExpandedEnchants.Util.Functions;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -151,11 +165,15 @@ public class EventsClass implements Listener
 			return;
 		ItemStack fs = event.getInventory().getItem(0);
 		ItemStack ss = event.getInventory().getItem(1);
-		if (fs == null || ss == null)
+		if (fs == null)
 			return;
-		event.getInventory().setRepairCost(5);
 		for (HumanEntity he : event.getViewers())
 			isModified.put(he.getUniqueId(), false);
+		if(ss == null) {
+			HandleCustomRenaming(fs, event);
+			return;
+		}
+		event.getInventory().setRepairCost(5);
 		if (Main.getPlugin().getConfig().getBoolean("AllowResourceEnchant"))
 			HandleResourceEnchants(fs, ss, event);
 		HandleSameItemUpgrades(fs, ss, event);
@@ -189,6 +207,8 @@ public class EventsClass implements Listener
 	{
 		if (Main.getPlugin().getConfig().getBoolean("IcyEnabled"))
 			HandleIcyEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("DisruptionEnabled")) HandleDisruptEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandlePlayerAttackEntity(e);
 	}
 
 	@EventHandler
@@ -218,6 +238,7 @@ public class EventsClass implements Listener
 	{
 		if (Main.getPlugin().getConfig().getBoolean("ShadowstepEnabled"))
 			HandleShadowStepEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinMobTarget(e);
 	}
 
 	@EventHandler
@@ -240,12 +261,248 @@ public class EventsClass implements Listener
 		CheckEndCityLoot(e);
 	}
 	
+	@EventHandler
+	public void onProjectileHitEvent(ProjectileHitEvent e) {
+		if(Main.getPlugin().getConfig().getBoolean("DisarmingEnabled")) HandleDisarmingEnchant(e);
+	}
+	
+	@EventHandler
+	public void onEntityTeleportEvent(EntityTeleportEvent e) {
+		CheckPreventTeleport(e);
+	}
+	
+	@EventHandler
+	public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent e) {
+		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinEnchant(e);
+	}
+	
+	@EventHandler
+	public void onPlayerJoinEvent(PlayerJoinEvent e) {
+		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinJoinEvent(e);
+	}
+	
+	
+	public void HandleAssassinEnchant(PlayerToggleSneakEvent e) {
+			Player player = e.getPlayer();
+			if (player.getInventory().getBoots() == null)
+				return;
+			if (player.getInventory().getBoots().getItemMeta() == null)
+				return;
+			if (!player.getInventory().getBoots().getItemMeta().hasEnchant(CustomEnchantsManager.ASSASSIN))
+				return;
+			int level = player.getInventory().getBoots().getItemMeta().getEnchantLevel(CustomEnchantsManager.ASSASSIN);
+			int countdown = 8 + (4 * level);
+			
+			AssassinInfo containsPlayer = null;
+			for(AssassinInfo i : assassinInfo) if(i.getPlayer().equals(player.getUniqueId())) containsPlayer = i;
+			if(containsPlayer == null) {
+					if(e.isSneaking()) {
+						BossBar bossBar = Bukkit.createBossBar("Hidden for "+ countdown + " seconds", BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY);
+						bossBar.addPlayer(e.getPlayer());
+						int refill = 48 - (2 * level);
+						AssassinInfo info = new AssassinInfo(player.getUniqueId(), countdown, refill, bossBar);
+						assassinInfo.add(info);
+						for(Player p : Bukkit.getOnlinePlayers()) p.hidePlayer(Main.getPlugin(), player);
+				}
+			}
+			else {
+				if(e.isSneaking()) {
+					if(countdown != containsPlayer.getCountdownMax()) containsPlayer.setCountdownMax(countdown);
+					if(48 - (2 * level) != containsPlayer.getRefillMax()) containsPlayer.setRefillMax(48 - (2 * level));
+					if(containsPlayer.getCountdown() > 0) {
+						containsPlayer.setTryCountdown(true);
+						for (Player p : Bukkit.getOnlinePlayers()) p.hidePlayer(Main.getPlugin(), player);
+					}
+					else {
+						containsPlayer.setTryCountdown(false);
+						for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), player);
+					}
+					if(!containsPlayer.bar.getPlayers().contains(player)) containsPlayer.bar.addPlayer(player);
+					containsPlayer.bar.setVisible(true);
+				}
+				else {
+					containsPlayer.setTryCountdown(false);
+					if(!containsPlayer.bar.getPlayers().contains(player)) containsPlayer.bar.addPlayer(player);
+					containsPlayer.bar.setVisible(false);
+					for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), player);
+				}
+			}
+	}
+	
+	public ArrayList<AssassinInfo> assassinInfo = new ArrayList<>();
+		
+	public void HandleAssassinJoinEvent(PlayerJoinEvent e) {
+		for(AssassinInfo p : assassinInfo) {
+			e.getPlayer().hidePlayer(Main.getPlugin(), Bukkit.getPlayer(p.getPlayer()));
+		}
+	}
+	
+	public void HandleAssassinMobTarget(EntityTargetEvent e) {
+		if(e.getTarget() instanceof Player) {
+			Player player = (Player) e.getTarget();
+			AssassinInfo info = null;
+			for(AssassinInfo i : assassinInfo) if(i.getPlayer().equals(player.getUniqueId())) info = i;
+			if(info != null) if(info.getTryCountdown() && info.getShouldCountdown()) e.setCancelled(true);
+			
+		}
+	}
+	
+	public void HandlePlayerAttackEntity(EntityDamageByEntityEvent e) {
+		if(!(e.getDamager() instanceof Player)) return;
+		Player player = (Player) e.getDamager();
+		AssassinInfo info = null;
+		for(AssassinInfo i : assassinInfo) if(i.getPlayer().equals(player.getUniqueId())) info = i;
+		if(info == null) return;
+		info.setShouldCountdown(false);
+		info.setRefill(info.getRefillMax());
+		info.bar.setColor(BarColor.YELLOW);
+		info.bar.setTitle("Recharging ability for " + Math.round(info.getRefillMax()) + " seconds");
+		info.setShouldRefill(true);
+		for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), Bukkit.getPlayer(info.getPlayer()));
+		
+	}
+	
+	public void HandleAssassinCountdowns() {
+		if(assassinInfo.size() == 0) return;
+		for(AssassinInfo info : assassinInfo) {
+			if(info.getTryCountdown()) {
+				if(info.getShouldCountdown()) {
+					info.setCountdown(info.getCountdown() - 1);
+					if(info.getCountdown() <= 0) {
+						info.setShouldCountdown(false);
+						info.setRefill(info.getRefillMax());
+						info.bar.setColor(BarColor.YELLOW);
+						info.bar.setTitle("Recharging ability for " + Math.round(info.getRefillMax()) + " seconds");
+						info.setShouldRefill(true);
+						for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), Bukkit.getPlayer(info.getPlayer()));
+					}
+					else {
+						info.bar.setProgress(info.getCountdown() / info.getCountdownMax());
+						info.bar.setTitle("Hidden for "+ Math.round(info.getCountdown()) + " seconds");
+					}
+				}
+			}
+			if(info.getShouldRefill()) {
+				info.setRefill(info.getRefill() - 1);
+				if(info.getRefill() == 0) {
+					info.setShouldCountdown(true);
+					info.setShouldRefill(false);
+					info.setCountdown(info.getCountdownMax());
+					info.bar.setColor(BarColor.GREEN);
+					info.bar.setTitle("Hidden for " + Math.round(info.getCountdownMax()) + " seconds");
+				}
+				else {
+					info.bar.setProgress(1 - (info.getRefill() / info.getRefillMax()));
+					info.bar.setTitle("Recharging ability for " + Math.round(info.getRefill()) + " seconds");
+				}
+			}
+		}
+	}
+	
+	public Map<UUID, Integer> preventTeleport = new HashMap<>();
+	public void HandleDisruptEnchant(EntityDamageByEntityEvent e) {
+		if(e.getDamager() instanceof Player && (e.getEntity() instanceof Enderman || e.getEntity() instanceof Shulker)) {
+			Player player = (Player) e.getDamager();
+			if(player.getInventory().getItemInMainHand() == null) return;
+			if(!player.getInventory().getItemInMainHand().hasItemMeta()) return;
+			if(!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.DISRUPTION)) return;
+			int level = player.getInventory().getItemInMainHand().getItemMeta().getEnchantLevel(CustomEnchantsManager.DISRUPTION);
+			preventTeleport.put(e.getEntity().getUniqueId(), 30);
+			e.setDamage(e.getDamage() + (2.5 * level));
+		}
+	}
+	
+	public void CheckPreventTeleport(EntityTeleportEvent e) {
+		if(!preventTeleport.containsKey(e.getEntity().getUniqueId())) return;
+		if(preventTeleport.get(e.getEntity().getUniqueId()) > 0) e.setCancelled(true);
+	}
+	
+	public void CountdownDisruptEnchant()
+	{
+		for (UUID uuid : preventTeleport.keySet())
+		{
+			int oldValue = preventTeleport.get(uuid);
+			if (oldValue > 0)
+				preventTeleport.put(uuid, oldValue - 1);
+			else
+				oldValue = 0;
+
+		}
+	}
+	
+	public Map<UUID, Integer> disarmCountdown = new HashMap<UUID, Integer>();
+	public void HandleDisarmingEnchant(ProjectileHitEvent e) {
+		if(e.getEntity() instanceof FishHook && e.getHitEntity() instanceof Player) {
+			if(e.getEntity().getShooter() instanceof Player) {
+				Player player = (Player) e.getEntity().getShooter();
+				Player enemy = (Player) e.getHitEntity();
+				if(player.getInventory().getItemInMainHand() == null) return;
+				if(!player.getInventory().getItemInMainHand().hasItemMeta()) return;
+				if(!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.DISARMING)) return;
+				int level = player.getInventory().getItemInMainHand().getItemMeta().getEnchantLevel(CustomEnchantsManager.DISARMING);
+				int ran = functions.GetRandomNumber(0, 100);
+				if (ran > (level * 2)) return;
+				if(disarmCountdown.containsKey(player.getUniqueId())) if(disarmCountdown.get(player.getUniqueId()) > 0) return;
+				
+				disarmCountdown.put(player.getUniqueId(), 30);
+				boolean allNull = true;
+				for(ItemStack item : enemy.getInventory().getArmorContents()) if(item != null) allNull = false;
+				if(allNull && enemy.getInventory().getItemInMainHand() == null) return;
+				if(allNull) {
+					enemy.dropItem(true);
+
+				}
+				else if(enemy.getInventory().getItemInMainHand() == null) {
+					ItemStack[] armors = enemy.getInventory().getArmorContents();
+					List<Integer> occupiedSlots = new ArrayList<>();
+					for(int i = 0; i < 4; i++) if(armors[i] != null) occupiedSlots.add(i);
+					int slot = occupiedSlots.get(functions.GetRandomNumber(0, occupiedSlots.size() - 1));
+					enemy.getWorld().dropItemNaturally(enemy.getLocation(), armors[slot]).setPickupDelay(40);;
+				    armors[slot] = null;
+				    enemy.getInventory().setArmorContents(armors);
+				}
+				else {
+					int num = functions.GetRandomNumber(1, 2);
+					if(num == 1) {
+						enemy.dropItem(true);
+					}
+					else {
+						ItemStack[] armors = enemy.getInventory().getArmorContents();
+						List<Integer> occupiedSlots = new ArrayList<>();
+						for(int i = 0; i < 4; i++) if(armors[i] != null) occupiedSlots.add(i);
+						int slot = occupiedSlots.get(functions.GetRandomNumber(0, occupiedSlots.size() - 1));
+						enemy.getWorld().dropItemNaturally(enemy.getLocation(), armors[slot]).setPickupDelay(40);
+					    armors[slot] = null;
+					    enemy.getInventory().setArmorContents(armors);
+					}
+				}
+				Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
+				{
+					enemy.updateInventory();
+				});
+			}
+		}
+	}
+	
+	public void CountdownDisarmEnchant()
+	{
+		for (UUID player : disarmCountdown.keySet())
+		{
+			int oldValue = disarmCountdown.get(player);
+			if (oldValue > 0)
+				disarmCountdown.put(player, oldValue - 1);
+			else
+				oldValue = 0;
+
+		}
+	}
+	
 	public void CheckEndCityLoot(LootGenerateEvent e) {
 		if(!LootTables.END_CITY_TREASURE.getLootTable().equals(e.getLootTable())) return;
 		int ran = functions.GetRandomNumber(0, 100);
 		if (ran > Main.getPlugin().getConfig().getInt("EndCityChance"))
 			return;
-		List<ItemStack> items = e.getLoot();
+		//List<ItemStack> items = e.getLoot();
 		int ranEnch = functions.GetRandomNumber(0, functions.GetEnabledEnchants().size());
 		ItemStack enchant = Main.itemManager.CreateCustomBook(functions.GetEnabledEnchants().get(ranEnch), 1);
 		e.getLoot().add(enchant);
@@ -269,7 +526,7 @@ public class EventsClass implements Listener
 		int ranEnch = functions.GetRandomNumber(0, functions.GetEnabledEnchants().size());
 		ItemStack enchant = Main.itemManager.CreateCustomBook(functions.GetEnabledEnchants().get(ranEnch), 1);
 		MerchantRecipe bookRecipe = new MerchantRecipe(enchant, functions.GetRandomNumber(2, 5));
-		ArrayList<ItemStack> ing = CustomEnchantsManager.tradeCosts[ranEnch].getItems();
+		ArrayList<ItemStack> ing = EnchantmentInformation.tradeCosts[ranEnch].getItems();
 		bookRecipe.setIngredients(ing);
 		newRecipes.add(bookRecipe);
 		trader.setRecipes(newRecipes);
@@ -448,13 +705,30 @@ public class EventsClass implements Listener
 		}
 		if (customRecipe == null)
 			return;
-
+		
 		CraftingInventory inv = e.getInventory();
 		ItemStack[] ingredients = inv.getMatrix();
 		boolean canCraft = true;
 
-		canCraft = CheckItemInRecipes(customRecipe.recipe.getKey().toString(), ingredients[1]);
+		if(ingredients[1] != null) if(ingredients[1].getType() == Material.POTION || ingredients[1].getType() == Material.ENCHANTED_BOOK || ingredients[1].getType() == Material.LINGERING_POTION || ingredients[1].getType() == Material.SPLASH_POTION)
+			canCraft = CheckItemInRecipes(customRecipe.recipe.getKey().toString(), ingredients[1]);
+		if(ingredients[4] != null) if(ingredients[4].getType() == Material.ENCHANTED_BOOK) {
+			if(ingredients[4].getItemMeta().getEnchants().size() > 0) {
+				Enchantment ench = (Enchantment) ingredients[4].getItemMeta().getEnchants().keySet().toArray()[0];
+				if(ench.equals(recipe.getResult().getItemMeta().getEnchants().keySet().toArray()[0])) {
+					if(ingredients[4].getItemMeta().getEnchantLevel(ench) < ench.getMaxLevel()) {
+						 inv.setResult(Main.itemManager.CreateCustomBook(ench, ingredients[4].getItemMeta().getEnchantLevel(ench) + 1));
+					}
+					else canCraft = false;
 
+				}
+				else canCraft = false; 
+			}
+			else {
+				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) ingredients[4].getItemMeta();
+				if(meta != null) if(meta.getStoredEnchants().size() > 0) canCraft = false;
+			}
+		}
 		for (int i = 0; i < customRecipe.amounts.length; i++)
 		{
 			if (ingredients[i] == null)
@@ -487,6 +761,14 @@ public class EventsClass implements Listener
 			PotionMeta nightmeta = (PotionMeta) ingredient.getItemMeta();
 			if (nightmeta.getBasePotionData().getType() == PotionType.NIGHT_VISION
 					&& nightmeta.getBasePotionData().isExtended())
+				;
+			else
+				canCraft = false;
+			break;
+		case "minecraft:ee_recipe_assassin":
+			PotionMeta assassin = (PotionMeta) ingredient.getItemMeta();
+			if (assassin.getBasePotionData().getType() == PotionType.INVISIBILITY
+					&& assassin.getBasePotionData().isExtended())
 				;
 			else
 				canCraft = false;
@@ -579,7 +861,7 @@ public class EventsClass implements Listener
 		return canCraft;
 	}
 
-	Map<UUID, List<ItemStack>> itemsToPreserve = new HashMap<>();
+	HashMap<UUID, ArrayList<ItemStack>> itemsToPreserve = new HashMap<>();
 
 	public void HandleSoulboundEnchant(PlayerDeathEvent e)
 	{
@@ -587,7 +869,7 @@ public class EventsClass implements Listener
 			return;
 		if (e.getKeepInventory())
 			return;
-		List<ItemStack> preserveItems = new ArrayList<>();
+		ArrayList<ItemStack> preserveItems = new ArrayList<>();
 		List<ItemStack> items = e.getDrops();
 		for (ItemStack item : items)
 			if (item.getItemMeta().hasEnchant(CustomEnchantsManager.SOULBOUND))
@@ -611,7 +893,7 @@ public class EventsClass implements Listener
 		itemsToPreserve.remove(player.getUniqueId());
 	}
 
-	List<Player> noFallDamage = new ArrayList<>();
+	ArrayList<UUID> noFallDamage = new ArrayList<>();
 
 	public void HandleElementalProtectionEnchant(EntityDamageEvent e)
 	{
@@ -636,19 +918,19 @@ public class EventsClass implements Listener
 				e.setCancelled(true);
 			if (e.getCause() == DamageCause.WITHER && level == 2)
 				e.setCancelled(true);
-			if (e.getCause() == DamageCause.VOID && level == 3)
+			if (e.getCause() == DamageCause.VOID && e.getDamage() == 4 && level == 3)
 			{
 				e.setCancelled(true);
-				if (!noFallDamage.contains(player))
-					noFallDamage.add(player);
+				if (!noFallDamage.contains(player.getUniqueId()))
+					noFallDamage.add(player.getUniqueId());
 				player.teleport(
 						new Location(player.getWorld(), player.getLocation().getX(), 128, player.getLocation().getZ()),
 						TeleportCause.PLUGIN);
 			}
-			if (e.getCause() == DamageCause.FALL && noFallDamage.contains(player))
+			if (e.getCause() == DamageCause.FALL && noFallDamage.contains(player.getUniqueId()))
 			{
 				e.setCancelled(true);
-				noFallDamage.remove(player);
+				noFallDamage.remove(player.getUniqueId());
 			}
 		}
 	}
@@ -731,28 +1013,34 @@ public class EventsClass implements Listener
 
 	public void ConstantCheckMethods()
 	{
+		CountdownDeflectEnchant();
+		CountdownDisarmEnchant();
+		CountdownDisruptEnchant();
+		HandleAssassinCountdowns();
+		
 		if (Bukkit.getOnlinePlayers().size() == 0)
 			return;
+		
 		for (Player player : Bukkit.getOnlinePlayers())
 		{
 			HandleOwlEyesEnchant(player);
 			HandleHeavensLightnessEnchant(player);
 			HandleThermalPlatingEnchant(player);
 			HandleLeapingEnchant(player);
-			CountdownDeflectEnchant();
-			if (canFreeze.containsKey(player))
+			if (canFreeze.containsKey(player.getUniqueId()))
 			{
-				double value = canFreeze.get(player);
+				double value = canFreeze.get(player.getUniqueId());
 				if (value == 0)
 					return;
-				canFreeze.put(player, value - 1);
+				canFreeze.put(player.getUniqueId(), value - 1);
 			}
 		}
+		
 	}
 
 	public void CountdownDeflectEnchant()
 	{
-		for (Player player : deflectCountdown.keySet())
+		for (UUID player : deflectCountdown.keySet())
 		{
 			int oldValue = deflectCountdown.get(player);
 			if (oldValue > 0)
@@ -763,7 +1051,8 @@ public class EventsClass implements Listener
 		}
 	}
 
-	public HashMap<Player, Integer> deflectCountdown = new HashMap<Player, Integer>();
+
+	public HashMap<UUID, Integer> deflectCountdown = new HashMap<UUID, Integer>();
 
 	public void HandleDeflectEnchant(EntityDamageEvent e)
 	{
@@ -795,7 +1084,7 @@ public class EventsClass implements Listener
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
 			}
-			if (!deflectCountdown.containsKey(player))
+			if (!deflectCountdown.containsKey(player.getUniqueId()))
 			{
 				e.setCancelled(true);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
@@ -804,7 +1093,7 @@ public class EventsClass implements Listener
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				player.getInventory().removeItem(
 						new ItemStack(Material.EMERALD, Main.getPlugin().getConfig().getInt("DeflectCost")));
-			} else if (deflectCountdown.get(player) == 0)
+			} else if (deflectCountdown.get(player.getUniqueId()) == 0)
 			{
 				e.setCancelled(true);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
@@ -817,12 +1106,12 @@ public class EventsClass implements Listener
 			{
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
 				TextComponent component = new TextComponent(
-						"Deflect has a cooldown left of " + deflectCountdown.get(player) + " seconds!");
+						"Deflect has a cooldown left of " + deflectCountdown.get(player.getUniqueId()) + " seconds!");
 				component.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
 			}
-			deflectCountdown.put(player, 31 - player.getInventory().getChestplate().getItemMeta()
+			deflectCountdown.put(player.getUniqueId(), 31 - player.getInventory().getChestplate().getItemMeta()
 					.getEnchantLevel(CustomEnchantsManager.DEFLECT));
 		}
 	}
@@ -960,7 +1249,7 @@ public class EventsClass implements Listener
 		}
 	}
 
-	public HashMap<Player, Double> canFreeze = new HashMap<Player, Double>();
+	public HashMap<UUID, Double> canFreeze = new HashMap<UUID, Double>();
 
 	public void HandleIcyEnchant(EntityDamageByEntityEvent e)
 	{
@@ -985,12 +1274,12 @@ public class EventsClass implements Listener
 
 				int level = player.getInventory().getItemInMainHand().getItemMeta()
 						.getEnchantLevel(CustomEnchantsManager.ICY) * 20;
-				if (!canFreeze.containsKey(player) || (canFreeze.get(player) == 0 && canFreeze.containsKey(player)))
+				if (!canFreeze.containsKey(player.getUniqueId()) || (canFreeze.get(player.getUniqueId()) == 0 && canFreeze.containsKey(player.getUniqueId())))
 				{
 					PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, level, 3, false, false, false);
 					other.addPotionEffect(effect);
 					other.getWorld().playSound(other.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
-					canFreeze.put(player, (double) 10);
+					canFreeze.put(player.getUniqueId(), (double) 10);
 					if (other instanceof Player)
 					{
 						PotionEffect effect2 = new PotionEffect(PotionEffectType.JUMP, level, 128, false, false, false);
@@ -1427,8 +1716,7 @@ public class EventsClass implements Listener
 
 		if (face.equals(BlockFace.UP) || face.equals(BlockFace.DOWN))
 		{
-			if (new Location(loc.getWorld(), loc.getX() + 1, loc.getY(), loc.getZ()).getBlock().getType()
-					.equals(block.getType()))
+			if (new Location(loc.getWorld(), loc.getX() + 1, loc.getY(), loc.getZ()).getBlock().getType().equals(block.getType()))
 				blocks.add(new Location(loc.getWorld(), loc.getX() + 1, loc.getY(), loc.getZ()).getBlock());
 			if (new Location(loc.getWorld(), loc.getX() - 1, loc.getY(), loc.getZ()).getBlock().getType()
 					.equals(block.getType()))
@@ -2015,7 +2303,7 @@ public class EventsClass implements Listener
 				return;
 			EnchantmentStorageMeta meta = (EnchantmentStorageMeta) fs.getItemMeta();
 			Object[] enchs = meta.getStoredEnchants().keySet().toArray();
-			if (enchs.length == 1)
+			if (enchs.length <= 1)
 				return;
 			Enchantment removeEnchant = (Enchantment) enchs[enchs.length - 1];
 			ItemStack resultBook = new ItemStack(Material.ENCHANTED_BOOK);
@@ -2030,7 +2318,8 @@ public class EventsClass implements Listener
 			e.setResult(resultBook);
 			for (HumanEntity he : e.getViewers())
 				isModified.put(he.getUniqueId(), false);
-		} else
+		} 
+		else
 		{
 			Object[] enchs = fs.getItemMeta().getEnchants().keySet().toArray();
 			if (enchs.length == 0)
@@ -2040,10 +2329,9 @@ public class EventsClass implements Listener
 			EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) resultBook.getItemMeta();
 			if (functions.IsCustomEnchant(removeEnchant))
 			{
-				resultBook.addUnsafeEnchantment(removeEnchant, fs.getEnchantmentLevel(removeEnchant));
+				resultBook.addUnsafeEnchantment(removeEnchant, fs.getItemMeta().getEnchantLevel(removeEnchant));
 				List<String> lore = new ArrayList<String>();
-				lore.add(ChatColor.GRAY + removeEnchant.getName() + " "
-						+ functions.GetNameByLevel(fs.getEnchantmentLevel(removeEnchant), removeEnchant.getMaxLevel()));
+				lore.add(ChatColor.GRAY + removeEnchant.getName() + " " + functions.GetNameByLevel(fs.getItemMeta().getEnchantLevel(removeEnchant), removeEnchant.getMaxLevel()));
 				ItemMeta customResultMeta = resultBook.getItemMeta();
 				customResultMeta.setLore(lore);
 				customResultMeta.setDisplayName(e.getInventory().getRenameText());
@@ -2054,9 +2342,10 @@ public class EventsClass implements Listener
 				e.setResult(resultBook);
 				for (HumanEntity he : e.getInventory().getViewers())
 					isModified.put(he.getUniqueId(), true);
-			} else
+			} 
+			else
 			{
-				resultMeta.addStoredEnchant(removeEnchant, fs.getEnchantmentLevel(removeEnchant), true);
+				resultMeta.addStoredEnchant(removeEnchant, fs.getItemMeta().getEnchantLevel(removeEnchant), true);
 				for (HumanEntity he : e.getInventory().getViewers()) {
 					removeLastEnchant.put(he.getUniqueId(), true);
 				}
@@ -2781,6 +3070,27 @@ public class EventsClass implements Listener
 		});
 	}
 
+	public void HandleCustomRenaming(ItemStack fs, PrepareAnvilEvent e) {
+		if(functions.ContainsCustomEnchant(fs)) {
+			ItemStack result = fs.clone();
+			ItemMeta meta = result.getItemMeta();
+			meta.setDisplayName(e.getInventory().getRenameText());
+			result.setItemMeta(meta);
+			e.setResult(result);
+			for (HumanEntity he : e.getViewers())
+				isModified.put(he.getUniqueId(), false);
+			Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
+			{
+				e.getInventory().setRepairCost(1);
+				for (HumanEntity he : e.getViewers())
+				{
+					Player pl = (Player) he;
+					pl.updateInventory();
+				}
+			});
+		}
+	}
+	
 	@SuppressWarnings("deprecation")
 
 	@EventHandler

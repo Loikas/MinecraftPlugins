@@ -48,8 +48,11 @@ public class CommandHandler implements CommandExecutor
 				if(args.length == 1) return false;
 				int level = 1;
 				if(args.length > 2) if(!args[2].equals("")) level = Integer.parseInt(args[2]);
+				if(args[1].equalsIgnoreCase("assassin")) return GiveCustomBook(CustomEnchantsManager.ASSASSIN, level, player);
 				if(args[1].equalsIgnoreCase("unbreakable")) return GiveCustomBook(CustomEnchantsManager.NOBREAKABLE, level, player);
 				if(args[1].equalsIgnoreCase("direct")) return GiveCustomBook(CustomEnchantsManager.DIRECT, level, player);
+				if(args[1].equalsIgnoreCase("disarming")) return GiveCustomBook(CustomEnchantsManager.DISARMING, level, player);
+				if(args[1].equalsIgnoreCase("disruption")) return GiveCustomBook(CustomEnchantsManager.DISRUPTION, level, player);
 				if(args[1].equalsIgnoreCase("autosmelt")) return GiveCustomBook(CustomEnchantsManager.AUTOSMELT, level, player);
 				if(args[1].equalsIgnoreCase("antigravity")) return GiveCustomBook(CustomEnchantsManager.ANTIGRAVITY, level, player);
 				if(args[1].equalsIgnoreCase("beheading")) return GiveCustomBook(CustomEnchantsManager.BEHEADING, level, player);
@@ -91,8 +94,11 @@ public class CommandHandler implements CommandExecutor
 				if(args.length == 1) return false;
 				int level = 1;
 				if(args.length >= 3) level = Integer.parseInt(args[2]);
+				if(args[1].equalsIgnoreCase("assassin")) return EnchantPlayerItem(CustomEnchantsManager.ASSASSIN, level, player);
 				if(args[1].equalsIgnoreCase("unbreakable")) return EnchantPlayerItem(CustomEnchantsManager.NOBREAKABLE, level, player);
 				if(args[1].equalsIgnoreCase("direct")) return EnchantPlayerItem(CustomEnchantsManager.DIRECT, level, player);
+				if(args[1].equalsIgnoreCase("disarming")) return EnchantPlayerItem(CustomEnchantsManager.DISARMING, level, player);
+				if(args[1].equalsIgnoreCase("disruption")) return EnchantPlayerItem(CustomEnchantsManager.DISRUPTION, level, player);
 				if(args[1].equalsIgnoreCase("autosmelt")) return EnchantPlayerItem(CustomEnchantsManager.AUTOSMELT, level, player);
 				if(args[1].equalsIgnoreCase("antigravity")) return EnchantPlayerItem(CustomEnchantsManager.ANTIGRAVITY, level, player);
 				if(args[1].equalsIgnoreCase("beheading")) return EnchantPlayerItem(CustomEnchantsManager.BEHEADING, level, player);

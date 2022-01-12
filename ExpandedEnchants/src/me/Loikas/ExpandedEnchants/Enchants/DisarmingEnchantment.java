@@ -1,20 +1,18 @@
 package me.Loikas.ExpandedEnchants.Enchants;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 
-import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
-import me.Loikas.ExpandedEnchants.EventsClass;
-
-public class ShadowStepEnchantment extends Enchantment
+public class DisarmingEnchantment extends Enchantment
 {
 	
 	public final String name;
 	public final int maxLvl;
 
-	public ShadowStepEnchantment(String namespace, String name, int lvl)
+	public DisarmingEnchantment(String namespace, String name, int lvl)
 	{
 		super(NamespacedKey.minecraft(namespace));
 		this.name = name;
@@ -24,14 +22,13 @@ public class ShadowStepEnchantment extends Enchantment
 	@Override
 	public boolean canEnchantItem(ItemStack arg0)
 	{
-		if(EventsClass.functions.CheckBootsTypes(arg0)) return true;
+		if(arg0.getType().equals(Material.FISHING_ROD)) return true;
 		return false;
 	}
 
 	@Override
 	public boolean conflictsWith(Enchantment arg0)
 	{
-		if(arg0.equals(CustomEnchantsManager.ASSASSIN)) return true;
 		return false;
 	}
 
