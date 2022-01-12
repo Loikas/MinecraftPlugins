@@ -2,10 +2,13 @@
 #They will still remain on the items but wont do anything
 #To disable the crafting recipes you have to reload the server
 AntigravityEnabled: true
+AssassinEnabled: true
 AutosmeltEnabled: true
 BeheadingEnabled: true
 DeflectEnabled: true
 DirectEnabled: true
+DisarmingEnabled: true
+DisruptionEnabled: true
 ElementalprotectionEnabled: true
 EyesofowlEnabled: true
 ExperienceboostEnabled: true
