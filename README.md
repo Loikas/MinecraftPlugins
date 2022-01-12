@@ -18,7 +18,7 @@ using the interactive gui you get with /ee recipes
 
 A big config to configure the plugin exactly as you like it
 
-## Six new custom enchants
+## Ten new custom enchants
 - Replanting:
 Put on a hoe to farm your crops much easier, when you right click on a full grown crop
 it will immediately plant a new one. Compatible with direct for an even better farming experience
@@ -35,7 +35,9 @@ Allows food to restore more food points
 - Elemental Protection:
 Gives you different protections based on the level:
 Level 1: poison protection, level 2: poison and wither protection, level 3: poison, wither and void protection
-
+- Assassin enchantment
+- Disarming enchantment
+- Disruption enchantment
 ## Wandering trader
 The wandering trader now has a chance to spawn with a custom enchantment book as trade. You can disable this in the config
 
