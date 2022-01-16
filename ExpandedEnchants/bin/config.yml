@@ -61,6 +61,10 @@ WanderingTraderChance: 30
 #Set to 0 to make them never spawn
 EndCityChance: 40
 
+#Percentage chance that a custom enchantment will show up in the enchanting table
+#Set to 0 to make them never show up
+EnchantingTableChance: 5
+
 #Set the amount of emeralds the deflect enchant uses every time it deflects damage
 DeflectCost: 1
 
