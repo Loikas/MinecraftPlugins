@@ -42,6 +42,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -281,6 +283,46 @@ public class EventsClass implements Listener
 		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinJoinEvent(e);
 	}
 	
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onPrepareItemEnchantEvent(PrepareItemEnchantEvent e) {
+		List<Enchantment> possible = new ArrayList<>();
+		for(Enchantment ench : functions.GetEnabledEnchants()) {
+			if(ench.canEnchantItem(e.getItem())) {
+				possible.add(ench);
+			}
+		}
+		if(possible.size() < 1) return;
+		if(functions.GetRandomNumber(1, 100) > Main.getPlugin().getConfig().getInt("EnchantingTableChance")) return;
+		if(e.getOffers()[2] == null) return;
+		e.getOffers()[2].setCost(40);
+	}
+	
+	@SuppressWarnings("deprecation")
+	@EventHandler
+	public void onEnchantItemEvent(EnchantItemEvent e) {
+		if(e.getExpLevelCost() != 40) return;
+		List<Enchantment> possible = new ArrayList<>();
+		for(Enchantment ench : functions.GetEnabledEnchants()) {
+			if(ench.canEnchantItem(e.getItem())) {
+				possible.add(ench);
+			}
+		}
+		if(possible.size() < 1) return;
+		Enchantment en = possible.get(functions.GetRandomNumber(0, possible.size() - 1));
+		ItemStack item = e.getItem();
+
+		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
+		{		
+			item.addUnsafeEnchantment(en, 1);
+			
+			ItemMeta meta = item.getItemMeta();
+			List<String> lore = new ArrayList<String>();
+			lore.add(ChatColor.GRAY + en.getName() + " " + EventsClass.functions.GetNameByLevel(item.getEnchantmentLevel(en), en.getMaxLevel()));
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+		});
+	}
 	
 	public void HandleAssassinEnchant(PlayerToggleSneakEvent e) {
 			Player player = e.getPlayer();
@@ -1517,7 +1559,6 @@ public class EventsClass implements Listener
 		case "BOTH":
 			break;
 		}
-
 		Damageable itemMeta = (Damageable) player.getInventory().getItemInMainHand().getItemMeta();
 		if (!itemMeta.isUnbreakable())
 		{
@@ -1660,8 +1701,10 @@ public class EventsClass implements Listener
 	public BlockFace GetBlockFace(Player player)
 	{
 		List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);
-		if (lastTwoTargetBlocks.size() != 2 || !lastTwoTargetBlocks.get(1).getType().isOccluding())
+		if (lastTwoTargetBlocks.size() != 2 /*|| !lastTwoTargetBlocks.get(1).getType().isOccluding()*/) {
 			return null;
+		}
+			
 		Block targetBlock = lastTwoTargetBlocks.get(1);
 		Block adjacentBlock = lastTwoTargetBlocks.get(0);
 		return targetBlock.getFace(adjacentBlock);
@@ -2358,6 +2401,7 @@ public class EventsClass implements Listener
 		}
 	}
 
+	
 	public void HandleBookResourceEnchant(ItemStack fs, ItemStack ss, PrepareAnvilEvent e)
 	{
 		if (fs.getType() == Material.BOOK)
@@ -2373,8 +2417,9 @@ public class EventsClass implements Listener
 			meta.setDisplayName(e.getInventory().getRenameText());
 			resultItem.setItemMeta(meta);
 			e.setResult(resultItem);
+			Main.Log("BookResourceEnchant");
 			for (HumanEntity he : e.getViewers())
-				isModified.put(he.getUniqueId(), false);
+				isModified.put(he.getUniqueId(), true);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 			{
 				if (Main.getPlugin().getConfig().getBoolean("ResourceEnchantXpEnabled"))
@@ -2435,19 +2480,21 @@ public class EventsClass implements Listener
 			if (resultItem.equals(fs))
 				resultItem = null;
 			e.setResult(resultItem);
+			Main.Log("BookResourceEnchant2");
 			for (HumanEntity he : e.getViewers())
-				isModified.put(he.getUniqueId(), false);
+				isModified.put(he.getUniqueId(), true);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 			{
 				if (Main.getPlugin().getConfig().getBoolean("ResourceEnchantXpEnabled"))
-					e.getInventory().setRepairCost(
-							(meta.getStoredEnchantLevel(ench) + 1) * (meta.getStoredEnchantLevel(ench) + 1));
+					e.getInventory().setRepairCost((meta.getStoredEnchantLevel(ench) + 1) * (meta.getStoredEnchantLevel(ench) + 1));
+				e.getInventory().setMaximumRepairCost(e.getInventory().getRepairCost() + 1);
 				for (HumanEntity he : e.getViewers())
 				{
 					Player pl = (Player) he;
 					pl.updateInventory();
 				}
 			});
+			
 		}
 
 	}
@@ -2472,8 +2519,10 @@ public class EventsClass implements Listener
 				if (item.conflictsWith(item2))
 					return;
 			}
-			if (!item.canEnchantItem(fs))
+			if (!item.canEnchantItem(fs)) {
+				e.setResult(null);
 				return;
+			}
 			if (fs.getItemMeta().hasEnchant(item))
 			{
 				if (meta.getStoredEnchantLevel(item) == itemMeta.getEnchantLevel(item))
@@ -2516,8 +2565,9 @@ public class EventsClass implements Listener
 		if (fs.equals(resultItem))
 			resultItem = null;
 		e.setResult(resultItem);
+		Main.Log("BookEnchant");
 		for (HumanEntity he : e.getViewers())
-			isModified.put(he.getUniqueId(), false);
+			isModified.put(he.getUniqueId(), true);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 		{
 			e.getInventory().setRepairCost(5);
@@ -2557,8 +2607,9 @@ public class EventsClass implements Listener
 			meta.setDisplayName(e.getInventory().getRenameText());
 			item.setItemMeta(meta);
 			e.setResult(item);
+			Main.Log("BookMerge");
 			for (HumanEntity he : e.getViewers())
-				isModified.put(he.getUniqueId(), false);
+				isModified.put(he.getUniqueId(), true);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 			{
 				e.getInventory().setRepairCost(5);
@@ -2572,6 +2623,7 @@ public class EventsClass implements Listener
 		} else if (functions.ContainsCustomEnchant(fs) || functions.ContainsCustomEnchant(ss))
 		{
 			e.setResult(null);
+			Main.Log("BookMerge2");
 			return;
 		}
 		ItemStack resultItem = new ItemStack(Material.ENCHANTED_BOOK);
@@ -2629,6 +2681,7 @@ public class EventsClass implements Listener
 		if (resultItem.equals(fs))
 			resultItem = null;
 		e.setResult(resultItem);
+		Main.Log("BookMerge3");
 		for (HumanEntity he : e.getViewers())
 			isModified.put(he.getUniqueId(), false);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
@@ -2643,6 +2696,7 @@ public class EventsClass implements Listener
 
 	}
 
+	
 	@SuppressWarnings("deprecation")
 	public void HandleCustomEnchantBooks(ItemStack fs, ItemStack ss, PrepareAnvilEvent e)
 	{
@@ -2719,8 +2773,9 @@ public class EventsClass implements Listener
 				resultItem.setItemMeta(itemMeta);
 			}
 			e.setResult(resultItem);
+			Main.Log("CustomEnchantBooks");
 			for (HumanEntity he : e.getViewers())
-				isModified.put(he.getUniqueId(), false);
+				isModified.put(he.getUniqueId(), true);
 			Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 			{
 				e.getInventory().setRepairCost(10);
@@ -2791,8 +2846,9 @@ public class EventsClass implements Listener
 			resultItem.setItemMeta(itemMeta);
 		}
 		e.setResult(resultItem);
+		Main.Log("CustomEnchantBooks2");
 		for (HumanEntity he : e.getViewers())
-			isModified.put(he.getUniqueId(), false);
+			isModified.put(he.getUniqueId(), true);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 		{
 			e.getInventory().setRepairCost(10);
@@ -2972,8 +3028,9 @@ public class EventsClass implements Listener
 		if (resultItem.equals(fs))
 			resultItem = null;
 		e.setResult(resultItem);
+		Main.Log("SameItemUpgrades");
 		for (HumanEntity he : e.getViewers())
-			isModified.put(he.getUniqueId(), false);
+			isModified.put(he.getUniqueId(), true);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 		{
 			e.getInventory().setRepairCost(5);
@@ -3056,12 +3113,14 @@ public class EventsClass implements Listener
 		result.setItemMeta(meta);
 		e.getInventory().setItem(2, result);
 		e.setResult(result);
+		Main.Log("ResourceEnchants");
 		for (HumanEntity he : e.getViewers())
-			isModified.put(he.getUniqueId(), false);
+			isModified.put(he.getUniqueId(), true);
 		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
 		{
 			if (Main.getPlugin().getConfig().getBoolean("ResourceEnchantXpEnabled"))
 				e.getInventory().setRepairCost(tot * tot);
+			e.getInventory().setMaximumRepairCost(e.getInventory().getRepairCost() + 1);
 			for (HumanEntity he : e.getViewers())
 			{
 				Player pl = (Player) he;
@@ -3091,8 +3150,8 @@ public class EventsClass implements Listener
 		}
 	}
 	
+	
 	@SuppressWarnings("deprecation")
-
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e)
 	{
@@ -3117,32 +3176,41 @@ public class EventsClass implements Listener
 						AnvilInventory ainv = (AnvilInventory) inv;
 						if (rawSlot == 2)
 						{
+							Bukkit.getServer().getConsoleSender().sendMessage("3");
 							if(!isModified.containsKey(ent.getUniqueId())) return;
 							if (!isModified.get(ent.getUniqueId())) return;
+							Bukkit.getServer().getConsoleSender().sendMessage("2");
 							ItemStack item = e.getCurrentItem();
 							if (item != null)
 							{
+								Bukkit.getServer().getConsoleSender().sendMessage("4");
 								ItemMeta meta = item.getItemMeta();
 								if (meta != null)
 								{
+									Bukkit.getServer().getConsoleSender().sendMessage("6");
 
 									if (ainv.getRepairCost() > player.getLevel())
 										return;
+									Bukkit.getServer().getConsoleSender().sendMessage("7");
 									player.setItemOnCursor(item);
 									player.setLevel(player.getLevel() - ainv.getRepairCost());
 									ItemStack cost = new ItemStack(inv.getContents()[1]);
+									Bukkit.getServer().getConsoleSender().sendMessage("1");
 									Enchantment ench = Main.recipeManager.GetEnchantment(cost.getType());
 									if (ench != null)
 									{
 										int amount = Main.recipeManager.GetAmount(ench);
 										int tot = cost.getAmount();
 										int left = tot - amount;
+										Bukkit.getServer().getConsoleSender().sendMessage("Amount: " + amount);
+										Bukkit.getServer().getConsoleSender().sendMessage("Left: " + left);
 										cost.setAmount(left);
 
 										ItemStack[] content = new ItemStack[] { null, cost, null };
 										inv.setContents(content);
 
-									} else if (inv.getContents()[1].getType() == Material.BOOK)
+									} 
+									else if (inv.getContents()[1].getType() == Material.BOOK)
 									{
 										ItemStack firstItem = inv.getContents()[0];
 										int amount = inv.getContents()[1].getAmount();
@@ -3198,8 +3266,8 @@ public class EventsClass implements Listener
 											}
 										}
 										inv.setContents(new ItemStack[] { firstItem, bookItem, null });
-									} else
-										inv.setContents(new ItemStack[] { null, null, null });
+									}
+									else inv.setContents(new ItemStack[] { null, null, null });
 									player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1, 1);
 									isModified.put(ent.getUniqueId(), false);
 

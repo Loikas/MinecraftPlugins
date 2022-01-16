@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
-import net.md_5.bungee.api.ChatColor;
 
 public class InventoryManager implements Listener
 {

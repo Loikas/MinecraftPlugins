@@ -47,7 +47,7 @@ public class EnchantmentInformation
 		new StringList(new String[] { "Deflect damage every 30 seconds", "Takes an emerald every time", "Each level lowers the cooldown by 1 second"}), //deflect
 		new StringList(new String[] { "Teleport broken blocks or killed mob items", "directly into your inventory" }), //direct
 		new StringList(new String[] { "Has a small chance to drop the enemy player's", "main hand weapon or one of their armor pieces.", "Cooldown of 30 seconds"}), //disarming
-		new StringList(new String[] { "Deal more damage to mobs that can teleport", "and disable their ability to teleport.", "These mobs include: Endermen and shulkers" }), //disruption
+		new StringList(new String[] { "Deal more damage to mobs that can teleport", "and disable their ability to teleport.", "These mobs are endermen and shulkers" }), //disruption
 		new StringList(new String[] { "Protects you against more damage sources", "which add up if you increase the level.", "- Level 1: Poison", "- Level 2: Wither", "- Level 3: Void" }),//elementalprotection
 		new StringList(new String[] { "No more potions of night vision", "see everything" }), //owleyes
 		new StringList(new String[] { "Chance to double the xp you get", "each level increases the chance by 15%"}), // expboost
