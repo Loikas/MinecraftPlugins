@@ -46,6 +46,11 @@ public class Main extends JavaPlugin
 	
 	public static ArrayList<CustomEnchantmentRecipe> customRecipes = new ArrayList<CustomEnchantmentRecipe>();
 	
+	private static boolean DoDebug = false;
+	public static void Log(String message) {
+		if(DoDebug) Bukkit.getServer().getConsoleSender().sendMessage(message);
+	}
+	
 	@Override
 	public void onEnable() 
 	{
