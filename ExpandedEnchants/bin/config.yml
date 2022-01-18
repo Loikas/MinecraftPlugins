@@ -24,6 +24,7 @@ LumberjackEnabled: true
 ReplantingEnabled: true
 ShadowstepEnabled: true
 SoulboundEnabled: true
+SplittingEnabled: true
 SteppingEnabled: true
 StonefistsEnabled: true
 ThermalplatingEnabled: true
