@@ -55,6 +55,7 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			returns.add("lumberjack");
 			returns.add("wide");
 			returns.add("feedingmodule");
+			returns.add("splitting");
 			returns.add("soulbound");
 			returns.add("shadowstep");
 			returns.add("replanting");
@@ -76,6 +77,7 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			if(args[1].equalsIgnoreCase("gourmand")) max = 2;
 			if(args[1].equalsIgnoreCase("lifesteal")) max = 3;
 			if(args[1].equalsIgnoreCase("icy")) max = 5;
+			if(args[1].equalsIgnoreCase("splitting")) max = 3;
 			if(args[1].equalsIgnoreCase("deflect")) max = 4;
 			if(args[1].equalsIgnoreCase("lumberjack")) max = 5;
 			if(args[1].equalsIgnoreCase("veinmine")) max = 5;

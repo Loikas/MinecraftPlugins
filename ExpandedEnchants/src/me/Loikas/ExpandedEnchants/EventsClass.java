@@ -13,6 +13,7 @@ import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -26,6 +27,7 @@ import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -34,8 +36,10 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.WanderingTrader;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -72,6 +76,7 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
@@ -80,6 +85,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.loot.LootTables;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -169,8 +175,10 @@ public class EventsClass implements Listener
 		ItemStack ss = event.getInventory().getItem(1);
 		if (fs == null)
 			return;
-		for (HumanEntity he : event.getViewers())
+		for (HumanEntity he : event.getViewers()) {
 			isModified.put(he.getUniqueId(), false);
+			removeLastEnchant.put(he.getUniqueId(), null);
+		}
 		if(ss == null) {
 			HandleCustomRenaming(fs, event);
 			return;
@@ -266,6 +274,7 @@ public class EventsClass implements Listener
 	@EventHandler
 	public void onProjectileHitEvent(ProjectileHitEvent e) {
 		if(Main.getPlugin().getConfig().getBoolean("DisarmingEnabled")) HandleDisarmingEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("SplittingEnabled")) HandleSplitEnchant(e);
 	}
 	
 	@EventHandler
@@ -283,6 +292,48 @@ public class EventsClass implements Listener
 		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinJoinEvent(e);
 	}
 	
+	public List<UUID> nonSplitArrows = new ArrayList<>();
+	public void HandleSplitEnchant(ProjectileHitEvent e) {
+		if(!(e.getEntity() instanceof AbstractArrow)) return;
+		if(!(e.getEntity().getShooter() instanceof Player)) return;
+		AbstractArrow arrow = (AbstractArrow) e.getEntity();
+		if(nonSplitArrows.contains(arrow.getUniqueId())) return;
+		Player player = (Player) e.getEntity().getShooter();
+		if(e.getHitEntity() == null) return;
+		
+		if(player.getInventory().getItemInMainHand().getType() != Material.BOW) return;
+		if(!player.getInventory().getItemInMainHand().hasItemMeta()) return;
+		if(!player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.SPLITTING)) return;
+		int arrowAmount = player.getInventory().getItemInMainHand().getItemMeta().getEnchantLevel(CustomEnchantsManager.SPLITTING) + 3;
+		List<Entity> entities = e.getHitEntity().getNearbyEntities((arrowAmount + 3), (arrowAmount + 3), (arrowAmount + 3));
+		LivingEntity hitEntity = (LivingEntity) e.getHitEntity();
+		List<LivingEntity> livingEntities = new ArrayList<>();
+		for(Entity ent : entities) {
+			if(ent.equals(player)) continue;
+			if(ent instanceof LivingEntity) livingEntities.add((LivingEntity) ent);
+		}
+		
+		if(livingEntities.size() == 0) return;
+		for(int i = 0; i < (livingEntities.size() < arrowAmount ? livingEntities.size() : arrowAmount); i++) {
+			Entity ent = livingEntities.get(i);
+			if(!hitEntity.hasLineOfSight(ent)) continue;
+			Projectile newArrow = player.launchProjectile(arrow.getClass());
+			newArrow.setBounce(false);
+			newArrow.setGlowing(true);
+			newArrow.teleport(new Location(hitEntity.getWorld(), hitEntity.getLocation().getX(), hitEntity.getLocation().getY() + hitEntity.getEyeHeight(), hitEntity.getLocation().getZ()), TeleportCause.PLUGIN);
+			Vector direction = new Vector(ent.getLocation().getX() - newArrow.getLocation().getX(), ent.getLocation().getY() - newArrow.getLocation().getY() + ent.getHeight(), ent.getLocation().getZ() - newArrow.getLocation().getZ());
+			newArrow.setGravity(false);
+			newArrow.setVelocity(direction.normalize().multiply(0.5));
+			AbstractArrow newArr = (AbstractArrow) newArrow;
+			newArr.setPickupStatus(PickupStatus.DISALLOWED);
+			nonSplitArrows.add(newArr.getUniqueId());
+			Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
+				newArrow.remove();
+				nonSplitArrows.remove(newArrow.getUniqueId());
+			}, 100);
+		}
+		
+	}
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onPrepareItemEnchantEvent(PrepareItemEnchantEvent e) {
@@ -1321,6 +1372,7 @@ public class EventsClass implements Listener
 					PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, level, 3, false, false, false);
 					other.addPotionEffect(effect);
 					other.getWorld().playSound(other.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, 1);
+					other.getWorld().spawnParticle(Particle.CLOUD, other.getLocation(), 20, 0, 1, 0, .1);
 					canFreeze.put(player.getUniqueId(), (double) 10);
 					if (other instanceof Player)
 					{
@@ -2211,24 +2263,17 @@ public class EventsClass implements Listener
 			return;
 		if (!event.getPlayer().getInventory().getItemInMainHand().hasItemMeta())
 			return;
-		if (!event.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-				.hasEnchant(CustomEnchantsManager.DIRECT))
+		if (!event.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.DIRECT))
 			return;
-		if (event.getPlayer().getGameMode() == GameMode.CREATIVE
-				|| event.getPlayer().getGameMode() == GameMode.SPECTATOR)
+		if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
 			return;
 		if (event.getPlayer().getInventory().firstEmpty() == -1)
 			return;
 		if (event.getBlock().getState() instanceof Container)
 			return;
 
-		if (!event.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-				.hasEnchant(CustomEnchantsManager.AUTOSMELT))
-		{
-			event.setCancelled(true);
-
-		} else
-			return;
+		if (!event.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.AUTOSMELT)) event.setCancelled(true);
+		else return;
 		Player player = event.getPlayer();
 
 		List<Item> drops = event.getItems();
@@ -2252,20 +2297,12 @@ public class EventsClass implements Listener
 		if (e.getBlock().getState() instanceof Container)
 			return;
 		List<Item> items = e.getItems();
-		boolean isOre = false;
-		for (Item item : items)
-		{
-			if (item.getItemStack().getType() == Material.RAW_IRON || item.getItemStack().getType() == Material.RAW_GOLD
-					|| item.getItemStack().getType() == Material.RAW_COPPER
-					|| item.getItemStack().getType() == Material.ANCIENT_DEBRIS)
-				isOre = true;
-		}
-		if (!isOre)
+		boolean isSmeltable = functions.ContainsSmeltable(items);
+		if (!isSmeltable)
 		{
 			if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.DIRECT))
 			{
 				Player player = e.getPlayer();
-				// Block block = e.getBlock();
 
 				player.getInventory().addItem(items.iterator().next().getItemStack());
 				e.setCancelled(true);
@@ -2276,54 +2313,13 @@ public class EventsClass implements Listener
 		for (Item item : items)
 		{
 			if (item == null)
-				return;
-			if (functions.CheckPickaxeTypes(e.getPlayer().getInventory().getItemInMainHand()))
-			{
-				if (item.getItemStack().getType() == Material.RAW_IRON)
-				{
-					if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-							.hasEnchant(CustomEnchantsManager.DIRECT))
-						e.getPlayer().getInventory()
-								.addItem(new ItemStack(Material.IRON_INGOT, item.getItemStack().getAmount()));
-					else
-						e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
-								new ItemStack(Material.IRON_INGOT, item.getItemStack().getAmount()));
-					i++;
-				}
-				if (item.getItemStack().getType() == Material.RAW_GOLD)
-				{
-					if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-							.hasEnchant(CustomEnchantsManager.DIRECT))
-						e.getPlayer().getInventory()
-								.addItem(new ItemStack(Material.GOLD_INGOT, item.getItemStack().getAmount()));
-					else
-						e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
-								new ItemStack(Material.GOLD_INGOT, item.getItemStack().getAmount()));
-					i++;
-				}
-				if (item.getItemStack().getType() == Material.RAW_COPPER)
-				{
-					if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-							.hasEnchant(CustomEnchantsManager.DIRECT))
-						e.getPlayer().getInventory()
-								.addItem(new ItemStack(Material.COPPER_INGOT, item.getItemStack().getAmount()));
-					else
-						e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
-								new ItemStack(Material.COPPER_INGOT, item.getItemStack().getAmount()));
-					i++;
-				}
-				if (item.getItemStack().getType() == Material.ANCIENT_DEBRIS)
-				{
-					if (e.getPlayer().getInventory().getItemInMainHand().getItemMeta()
-							.hasEnchant(CustomEnchantsManager.DIRECT))
-						e.getPlayer().getInventory()
-								.addItem(new ItemStack(Material.NETHERITE_SCRAP, item.getItemStack().getAmount()));
-					else
-						e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
-								new ItemStack(Material.NETHERITE_SCRAP, item.getItemStack().getAmount()));
-					i++;
-				}
-			}
+				continue;
+			if(e.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.DIRECT))
+				e.getPlayer().getInventory().addItem((new ItemStack(functions.SmeltedCounterpart(item.getItemStack().getType()), item.getItemStack().getAmount())));
+			else
+				e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(functions.SmeltedCounterpart(item.getItemStack().getType()), item.getItemStack().getAmount()));
+			i++;
+			
 		}
 		for (int y = 0; y < i; y++)
 		{
@@ -2332,7 +2328,7 @@ public class EventsClass implements Listener
 
 	}
 
-	public Map<UUID, Boolean> removeLastEnchant = new HashMap<>();
+	public Map<UUID, Enchantment> removeLastEnchant = new HashMap<>();
 	public Map<UUID, Boolean> isModified = new HashMap<>();
 
 	@SuppressWarnings("deprecation")
@@ -2349,18 +2345,23 @@ public class EventsClass implements Listener
 			if (enchs.length <= 1)
 				return;
 			Enchantment removeEnchant = (Enchantment) enchs[enchs.length - 1];
+			for(Object i : enchs) {
+				Enchantment ench = (Enchantment) i;
+				Main.Log(functions.GetEnchantmentName(ench));
+				if(e.getInventory().getRenameText().equalsIgnoreCase(functions.GetEnchantmentName(ench))) removeEnchant = ench;
+			}
 			ItemStack resultBook = new ItemStack(Material.ENCHANTED_BOOK);
 			EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) resultBook.getItemMeta();
 			resultMeta.addStoredEnchant(removeEnchant, meta.getStoredEnchantLevel(removeEnchant), true);
-			resultMeta.setDisplayName(e.getInventory().getRenameText());
+			//resultMeta.setDisplayName(e.getInventory().getRenameText());
 			resultBook.setItemMeta(resultMeta);
 			meta.removeStoredEnchant(removeEnchant);
 			for (HumanEntity he : e.getInventory().getViewers()) {
-				removeLastEnchant.put(he.getUniqueId(), true);
+				removeLastEnchant.put(he.getUniqueId(), removeEnchant);
 			}
 			e.setResult(resultBook);
 			for (HumanEntity he : e.getViewers())
-				isModified.put(he.getUniqueId(), false);
+				isModified.put(he.getUniqueId(), true);
 		} 
 		else
 		{
@@ -2368,6 +2369,10 @@ public class EventsClass implements Listener
 			if (enchs.length == 0)
 				return;
 			Enchantment removeEnchant = (Enchantment) enchs[enchs.length - 1];
+			for(Object i : enchs) {
+				Enchantment ench = (Enchantment) i;
+				if(e.getInventory().getRenameText().equalsIgnoreCase(ench.getName())) removeEnchant = ench;
+			}
 			ItemStack resultBook = new ItemStack(Material.ENCHANTED_BOOK);
 			EnchantmentStorageMeta resultMeta = (EnchantmentStorageMeta) resultBook.getItemMeta();
 			if (functions.IsCustomEnchant(removeEnchant))
@@ -2377,10 +2382,10 @@ public class EventsClass implements Listener
 				lore.add(ChatColor.GRAY + removeEnchant.getName() + " " + functions.GetNameByLevel(fs.getItemMeta().getEnchantLevel(removeEnchant), removeEnchant.getMaxLevel()));
 				ItemMeta customResultMeta = resultBook.getItemMeta();
 				customResultMeta.setLore(lore);
-				customResultMeta.setDisplayName(e.getInventory().getRenameText());
+				//customResultMeta.setDisplayName(e.getInventory().getRenameText());
 				resultBook.setItemMeta(customResultMeta);
 				for (HumanEntity he : e.getInventory().getViewers()) {
-					removeLastEnchant.put(he.getUniqueId(), true);
+					removeLastEnchant.put(he.getUniqueId(), removeEnchant);
 				}
 				e.setResult(resultBook);
 				for (HumanEntity he : e.getInventory().getViewers())
@@ -2390,9 +2395,9 @@ public class EventsClass implements Listener
 			{
 				resultMeta.addStoredEnchant(removeEnchant, fs.getItemMeta().getEnchantLevel(removeEnchant), true);
 				for (HumanEntity he : e.getInventory().getViewers()) {
-					removeLastEnchant.put(he.getUniqueId(), true);
+					removeLastEnchant.put(he.getUniqueId(), removeEnchant);
 				}
-				resultMeta.setDisplayName(e.getInventory().getRenameText());
+				//resultMeta.setDisplayName(e.getInventory().getRenameText());
 				resultBook.setItemMeta(resultMeta);
 				e.setResult(resultBook);
 				for (HumanEntity he : e.getViewers())
@@ -2743,6 +2748,16 @@ public class EventsClass implements Listener
 			{
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
 						new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed",
 								itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4,
@@ -2754,6 +2769,16 @@ public class EventsClass implements Listener
 			{
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE,
 						new AttributeModifier(UUID.randomUUID(), "generic.attackDamage",
 								itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3,
@@ -2765,6 +2790,16 @@ public class EventsClass implements Listener
 			{
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH,
 						new AttributeModifier(UUID.randomUUID(), "generic.maxHealth",
 								itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2,
@@ -2816,6 +2851,16 @@ public class EventsClass implements Listener
 		{
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			
 			itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
 					new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed",
 							itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4,
@@ -2827,6 +2872,16 @@ public class EventsClass implements Listener
 		{
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			
 			itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE,
 					new AttributeModifier(UUID.randomUUID(), "generic.attackDamage",
 							itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3,
@@ -2838,6 +2893,16 @@ public class EventsClass implements Listener
 		{
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			
 			itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH,
 					new AttributeModifier(UUID.randomUUID(), "generic.maxHealth",
 							itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2,
@@ -2894,6 +2959,16 @@ public class EventsClass implements Listener
 							{
 								ItemMeta itemMeta = resultItem.getItemMeta();
 								itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+								if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+								if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+								if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+								
 								itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
 										new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed",
 												itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4,
@@ -2905,6 +2980,16 @@ public class EventsClass implements Listener
 							{
 								ItemMeta itemMeta = resultItem.getItemMeta();
 								itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+								if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								
 								itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE,
 										new AttributeModifier(UUID.randomUUID(), "generic.attackDamage",
 												itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3,
@@ -2916,6 +3001,16 @@ public class EventsClass implements Listener
 							{
 								ItemMeta itemMeta = resultItem.getItemMeta();
 								itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+								itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+								if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+									itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+								
 								itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH,
 										new AttributeModifier(UUID.randomUUID(), "generic.maxHealth",
 												itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2,
@@ -2992,8 +3087,19 @@ public class EventsClass implements Listener
 						if (resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.TRAVELER))
 						{
 							ItemMeta itemMeta = resultItem.getItemMeta();
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+							if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+							if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+							if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+							
 							itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
-									new AttributeModifier("generic.movementSpeed",
+									new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed",
 											itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4,
 											AttributeModifier.Operation.ADD_SCALAR));
 							itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
@@ -3003,17 +3109,35 @@ public class EventsClass implements Listener
 						{
 							ItemMeta itemMeta = resultItem.getItemMeta();
 							itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
-							itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE,
-									new AttributeModifier(UUID.randomUUID(), "generic.attackDamage",
-											itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3,
-											AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+							if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							
+							itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
 							itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+							
 							resultItem.setItemMeta(itemMeta);
 						}
 						if (resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.HEALTHBOOST))
 						{
 							ItemMeta itemMeta = resultItem.getItemMeta();
 							itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+							itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+							if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+								itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+							
 							itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH,
 									new AttributeModifier(UUID.randomUUID(), "generic.maxHealth",
 											itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2,
@@ -3110,23 +3234,30 @@ public class EventsClass implements Listener
 		int tot = lvl + extra;
 		meta.addEnchant(goal, tot, true);
 		meta.setDisplayName(e.getInventory().getRenameText());
+		Repairable repair = (Repairable) meta;
+		repair.setRepairCost(0);
 		result.setItemMeta(meta);
 		e.getInventory().setItem(2, result);
 		e.setResult(result);
 		Main.Log("ResourceEnchants");
+		e.getInventory().setMaximumRepairCost(20000);
 		for (HumanEntity he : e.getViewers())
 			isModified.put(he.getUniqueId(), true);
-		Bukkit.getScheduler().runTask(Main.getPlugin(), () ->
+		Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () ->
 		{
-			if (Main.getPlugin().getConfig().getBoolean("ResourceEnchantXpEnabled"))
+			Main.Log("Max: " + e.getInventory().getMaximumRepairCost()); 
+			if (Main.getPlugin().getConfig().getBoolean("ResourceEnchantXpEnabled")) {
 				e.getInventory().setRepairCost(tot * tot);
-			e.getInventory().setMaximumRepairCost(e.getInventory().getRepairCost() + 1);
+				e.getView().setProperty(Property.REPAIR_COST, e.getInventory().getRepairCost());
+				
+			}
+			Main.Log("Cost: " + e.getInventory().getRepairCost());
 			for (HumanEntity he : e.getViewers())
 			{
 				Player pl = (Player) he;
 				pl.updateInventory();
 			}
-		});
+		}, 2);
 	}
 
 	public void HandleCustomRenaming(ItemStack fs, PrepareAnvilEvent e) {
@@ -3218,22 +3349,17 @@ public class EventsClass implements Listener
 										bookItem.setAmount(amount - 1);
 										if (removeLastEnchant.containsKey(ent.getUniqueId()))
 										{
-											if (removeLastEnchant.get(ent.getUniqueId()))
+											if (removeLastEnchant.get(ent.getUniqueId()) != null)
 											{
 												if (firstItem.getType() == Material.ENCHANTED_BOOK)
 												{
-													EnchantmentStorageMeta firstMeta = (EnchantmentStorageMeta) firstItem
-															.getItemMeta();
-													firstMeta.removeStoredEnchant((Enchantment) firstMeta
-															.getStoredEnchants().keySet()
-															.toArray()[firstMeta.getStoredEnchants().keySet().size()
-																	- 1]);
+													EnchantmentStorageMeta firstMeta = (EnchantmentStorageMeta) firstItem.getItemMeta();
+													Enchantment enchant = removeLastEnchant.get(ent.getUniqueId());
+													firstMeta.removeStoredEnchant(enchant);
 													firstItem.setItemMeta(firstMeta);
 												} else
 												{
-													Enchantment removeEnch = (Enchantment) firstItem.getEnchantments()
-															.keySet()
-															.toArray()[firstItem.getEnchantments().keySet().size() - 1];
+													Enchantment removeEnch = removeLastEnchant.get(ent.getUniqueId());
 													firstItem.removeEnchantment(removeEnch);
 													if (functions.IsCustomEnchant(removeEnch))
 													{
@@ -3262,7 +3388,7 @@ public class EventsClass implements Listener
 													}
 												}
 												for (HumanEntity he : e.getClickedInventory().getViewers())
-													removeLastEnchant.put(he.getUniqueId(), false);
+													removeLastEnchant.put(he.getUniqueId(), null);
 											}
 										}
 										inv.setContents(new ItemStack[] { firstItem, bookItem, null });

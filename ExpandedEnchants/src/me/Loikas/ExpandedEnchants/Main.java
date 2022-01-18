@@ -141,6 +141,11 @@ public class Main extends JavaPlugin
 		for(Map.Entry<UUID, Double> entry : eventsClass.canFreeze.entrySet()) {
 			saveData.set("freeze." + entry.getKey(), entry.getValue());
 		}
+		saveData.set("split", null);
+		if(eventsClass.nonSplitArrows.size() > 0) for (int i = 0; i < eventsClass.nonSplitArrows.size(); i++) {
+			saveData.set("split." + "num" + i, eventsClass.nonSplitArrows.get(i).toString());
+			saveData.set("split.max", i);
+		}
 		saveData.set("assassin", null);
 		for(AssassinInfo entry : eventsClass.assassinInfo) {
 			saveData.set("assassin." + entry.getPlayer() + ".countdownMax",entry.getCountdownMax());
@@ -171,6 +176,15 @@ public class Main extends JavaPlugin
 			int max = saveData.getConfigurationSection("falldamage").getInt("max");
 			for(int i = 0; i < max + 1; i++) {
 				String uuid = saveData.getConfigurationSection("falldamage").getString("num" + i);
+				 eventsClass.noFallDamage.add(UUID.fromString(uuid));
+			}
+			
+			
+		}
+		if(saveData.getConfigurationSection("split") != null) {
+			int max = saveData.getConfigurationSection("split").getInt("max");
+			for(int i = 0; i < max + 1; i++) {
+				String uuid = saveData.getConfigurationSection("split").getString("num" + i);
 				 eventsClass.noFallDamage.add(UUID.fromString(uuid));
 			}
 			
@@ -250,6 +264,7 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.REPLANTING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SHADOWSTEP);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SOULBOUND);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SPLITTING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STEPPING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STONEFISTS);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.THERMALPLATING);
@@ -307,6 +322,40 @@ public class Main extends JavaPlugin
 				recipe.setIngredient('F', Material.AMETHYST_SHARD);
 				recipe.setIngredient('H', Material.LAPIS_LAZULI);
 				amounts = new Integer[] { 0, 1, 0, 48, 1, 36, 0, 16, 0 };
+			}
+			customRecipes.add(new CustomEnchantmentRecipe(recipe, amounts));
+			Bukkit.getServer().addRecipe(recipe);	
+		}
+		if(getPlugin().getConfig().getBoolean("SplittingEnabled"))
+		{
+			ShapedRecipe recipe = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_splitting"), itemManager.CreateCustomBook(CustomEnchantsManager.SPLITTING, 1));
+			recipe.shape("ABC","DEF", "GHI");
+			Integer[] amounts = new Integer[9];
+			boolean doDefault = false;
+			if(recipeData != null) { 
+				if(recipeData.getConfigurationSection("ee_recipe_splitting") != null) {
+					recipe.setIngredient('A', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("A", "AIR")));
+					recipe.setIngredient('B', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("B", "AIR")));
+					recipe.setIngredient('C', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("C", "AIR")));
+					recipe.setIngredient('D', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("D", "AIR")));
+					recipe.setIngredient('E', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("E", "AIR")));
+					recipe.setIngredient('F', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("F", "AIR")));
+					recipe.setIngredient('G', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("G", "AIR")));
+					recipe.setIngredient('H', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("H", "AIR")));
+					recipe.setIngredient('I', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_splitting.Ingredients").getString("I", "AIR")));
+					List<Integer> ints = recipeData.getConfigurationSection("ee_recipe_splitting").getIntegerList("Amounts");
+					amounts = new Integer[] {ints.get(0), ints.get(1), ints.get(2), ints.get(3), ints.get(4), ints.get(5), ints.get(6), ints.get(7), ints.get(8),};
+				}
+				else doDefault = true;
+			}
+			else doDefault = true;
+			if(doDefault) {
+				recipe.setIngredient('B', Material.NETHERITE_INGOT);
+				recipe.setIngredient('D', Material.ARROW);
+				recipe.setIngredient('E', Material.ENCHANTED_BOOK);
+				recipe.setIngredient('F', Material.SPECTRAL_ARROW);
+				recipe.setIngredient('H', Material.LAPIS_LAZULI);
+				amounts = new Integer[] { 0, 1, 0, 64, 1, 64, 0, 16, 0 };
 			}
 			customRecipes.add(new CustomEnchantmentRecipe(recipe, amounts));
 			Bukkit.getServer().addRecipe(recipe);	

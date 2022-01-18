@@ -2,8 +2,10 @@ package me.Loikas.ExpandedEnchants.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -14,12 +16,131 @@ import me.Loikas.ExpandedEnchants.Main;
 public class Functions
 {
 	
+	public boolean ContainsSmeltable(List<Item> items) {
+		for(Item item : items) {
+			switch(item.getItemStack().getType()) {
+				case RAW_IRON: return true;
+				case RAW_COPPER: return true;
+				case RAW_GOLD: return true;
+				case ANCIENT_DEBRIS: return true;
+				case RAW_GOLD_BLOCK: return true;
+				case RAW_IRON_BLOCK: return true;
+				case RAW_COPPER_BLOCK: return true;
+				case SAND: return true;
+				case RED_SAND: return true;
+				case KELP: return true;
+				case CACTUS: return true;
+				case CHORUS_FRUIT: return true;
+				case CLAY: return true;
+				case COBBLESTONE: return true;
+				case WET_SPONGE: return true;
+				case NETHERRACK: return true;
+				case STONE_BRICKS: return true;
+				case DARK_OAK_WOOD: return true;
+				case SPRUCE_WOOD: return true;
+				case ACACIA_WOOD: return true;
+				case BIRCH_WOOD: return true;
+				case JUNGLE_WOOD: return true;
+				case OAK_WOOD: return true;
+				case QUARTZ_BLOCK: return true;
+				case STRIPPED_DARK_OAK_WOOD: return true;
+				case STRIPPED_SPRUCE_WOOD: return true;
+				case STRIPPED_ACACIA_WOOD: return true;
+				case STRIPPED_BIRCH_WOOD: return true;
+				case STRIPPED_JUNGLE_WOOD: return true;
+				case STRIPPED_OAK_WOOD: return true;
+				default: continue;
+			}
+		}
+		return false;
+	}
+	
+	public Material SmeltedCounterpart(Material mat) {
+			switch(mat) {
+				case RAW_IRON: return Material.IRON_INGOT;
+				case RAW_COPPER: return Material.COPPER_INGOT;
+				case RAW_GOLD: return Material.GOLD_INGOT;
+				case ANCIENT_DEBRIS: return Material.NETHERITE_SCRAP;
+				case RAW_GOLD_BLOCK: return Material.GOLD_BLOCK;
+				case RAW_IRON_BLOCK: return Material.IRON_BLOCK;
+				case RAW_COPPER_BLOCK: return Material.COPPER_BLOCK;
+				case SAND: return Material.GLASS;
+				case RED_SAND: return Material.GLASS;
+				case KELP: return Material.DRIED_KELP;
+				case CACTUS: return Material.GREEN_DYE;
+				case CHORUS_FRUIT: return Material.POPPED_CHORUS_FRUIT;
+				case CLAY: return Material.TERRACOTTA;
+				case COBBLESTONE: return Material.STONE;
+				case WET_SPONGE: return Material.SPONGE;
+				case NETHERRACK: return Material.NETHER_BRICK;
+				case STONE_BRICKS: return Material.CRACKED_STONE_BRICKS;
+				case DARK_OAK_WOOD: return Material.CHARCOAL;
+				case SPRUCE_WOOD: return Material.CHARCOAL;
+				case ACACIA_WOOD: return Material.CHARCOAL;
+				case BIRCH_WOOD: return Material.CHARCOAL;
+				case JUNGLE_WOOD: return Material.CHARCOAL;
+				case OAK_WOOD: return Material.CHARCOAL;
+				case QUARTZ_BLOCK: return Material.SMOOTH_QUARTZ;
+				case STRIPPED_DARK_OAK_WOOD: return Material.CHARCOAL;
+				case STRIPPED_SPRUCE_WOOD: return Material.CHARCOAL;
+				case STRIPPED_ACACIA_WOOD: return Material.CHARCOAL;
+				case STRIPPED_BIRCH_WOOD: return Material.CHARCOAL;
+				case STRIPPED_JUNGLE_WOOD: return Material.CHARCOAL;
+				case STRIPPED_OAK_WOOD: return Material.CHARCOAL;
+
+				default: return null;
+			}
+		
+	}
+	
 	public int GetRandomNumber(int min, int max) {
 		return (int) (Math.floor(Math.random() * (max - min + 1)) + min);
 	}
 	
 	public double GetRandomNumber(double min, double max) {
 		return Math.random() * (max - min) + min;
+	}
+	
+	public int GetArmorPoints(Material mat) {
+		switch (mat)
+		{
+		case CHAINMAIL_CHESTPLATE: return 5;
+		case LEATHER_CHESTPLATE: return 3;
+		case IRON_CHESTPLATE: return 6;
+		case GOLDEN_CHESTPLATE: return 5;
+		case NETHERITE_CHESTPLATE: return 8;
+		case DIAMOND_CHESTPLATE: return 8;
+		
+		case LEATHER_LEGGINGS: return 2;
+		case CHAINMAIL_LEGGINGS: return 4;
+		case IRON_LEGGINGS: return 5;
+		case GOLDEN_LEGGINGS: return 3;
+		case DIAMOND_LEGGINGS: return 6;
+		case NETHERITE_LEGGINGS: return 6;
+		
+		default: return 0;
+		}
+	}
+	
+	public int GetToughnessPoints(Material mat) {
+		switch (mat)
+		{
+		case NETHERITE_CHESTPLATE: return 3;
+		case DIAMOND_CHESTPLATE: return 2;
+		
+		case DIAMOND_LEGGINGS: return 2;
+		case NETHERITE_LEGGINGS: return 3;
+		
+		default: return 0;
+		}
+	}
+	
+	public int GetKnockbackPoints(Material mat) {
+		switch(mat) {
+		case NETHERITE_CHESTPLATE: return 1;
+		case NETHERITE_LEGGINGS: return 1;
+		default: return 0;
+		}
 	}
 	
 	public List<Enchantment> GetEnabledEnchants() {
@@ -47,6 +168,7 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("ReplantingEnabled")) enchs.add(CustomEnchantsManager.REPLANTING);
 		if(Main.getPlugin().getConfig().getBoolean("ShadowstepEnabled")) enchs.add(CustomEnchantsManager.SHADOWSTEP);
 		if(Main.getPlugin().getConfig().getBoolean("SoulboundEnabled")) enchs.add(CustomEnchantsManager.SOULBOUND);
+		if(Main.getPlugin().getConfig().getBoolean("SplittingEnabled")) enchs.add(CustomEnchantsManager.SPLITTING);
 		if(Main.getPlugin().getConfig().getBoolean("SteppingEnabled")) enchs.add(CustomEnchantsManager.STEPPING);
 		if(Main.getPlugin().getConfig().getBoolean("StonefistsEnabled")) enchs.add(CustomEnchantsManager.STONEFISTS);
 		if(Main.getPlugin().getConfig().getBoolean("ThermalplatingEnabled")) enchs.add(CustomEnchantsManager.THERMALPLATING);
@@ -455,6 +577,7 @@ public class Functions
 	}
 
 	public String GetEnchantmentName(Enchantment ench) {
+		
 		if(ench.equals(Enchantment.ARROW_DAMAGE)) return "Power";
 		if(ench.equals(Enchantment.ARROW_FIRE)) return "Flame";
 		if(ench.equals(Enchantment.ARROW_INFINITE)) return "Infinity";
