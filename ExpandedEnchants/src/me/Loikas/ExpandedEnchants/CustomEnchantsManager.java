@@ -8,7 +8,38 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
-import me.Loikas.ExpandedEnchants.Enchants.*;
+
+import me.Loikas.ExpandedEnchants.Enchants.AntiGravityEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.AssassinEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.AutoSmeltEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.BeheadingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.DeflectEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.DirectEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.DisarmingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.DisruptionEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.ElementalProtectionEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.ExpBoostEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.FeedingModuleEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.GourmandEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.HealthBoostEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.HeavensLightnessEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.IcyEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.LavaWalkerEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.LeapingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.LifestealEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.LumberjackEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.OwlEyesEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.ReplantingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.ShadowStepEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.SoulboundEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.SplittingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.SteppingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.StoneFistsEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.ThermalPlatingEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.TravelerEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.UnbreakableEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.VeinmineEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.WideEnchantment;
 
 public class CustomEnchantsManager
 {
@@ -38,6 +69,7 @@ public class CustomEnchantsManager
 	public static final Enchantment GOURMAND = new GourmandEnchantment("ee_gourmand", "Gourmand", 2);
 	public static final Enchantment SHADOWSTEP = new ShadowStepEnchantment("ee_shadowstep", "Shadow Step", 5);
 	public static final Enchantment SOULBOUND = new SoulboundEnchantment("ee_soulbound", "Soulbound", 1);
+	public static final Enchantment SPLITTING = new SplittingEnchantment("ee_splitting", "Splitting", 3);
 	public static final Enchantment REPLANTING = new ReplantingEnchantment("ee_replanting", "Replanting", 1);
 	public static final Enchantment ELEMENTALPROTECTION = new ElementalProtectionEnchantment("ee_elemental", "Elemental Protection", 3);
 	public static final Enchantment DISARMING = new DisarmingEnchantment("ee_disarming", "Disarming", 4);

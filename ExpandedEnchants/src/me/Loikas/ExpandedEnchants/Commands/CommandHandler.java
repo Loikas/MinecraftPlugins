@@ -75,6 +75,7 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("gourmand")) return GiveCustomBook(CustomEnchantsManager.GOURMAND, level, player);
 				if(args[1].equalsIgnoreCase("stepping")) return GiveCustomBook(CustomEnchantsManager.STEPPING, level, player);
 				if(args[1].equalsIgnoreCase("feedingmodule")) return GiveCustomBook(CustomEnchantsManager.FEEDINGMODULE, level, player);
+				if(args[1].equalsIgnoreCase("splitting")) return GiveCustomBook(CustomEnchantsManager.SPLITTING, level, player);
 				if(args[1].equalsIgnoreCase("shadowstep")) return GiveCustomBook(CustomEnchantsManager.SHADOWSTEP, level, player);
 				if(args[1].equalsIgnoreCase("soulbound")) return GiveCustomBook(CustomEnchantsManager.SOULBOUND, level, player);
 				if(args[1].equalsIgnoreCase("replanting")) return GiveCustomBook(CustomEnchantsManager.REPLANTING, level, player);
@@ -122,6 +123,7 @@ public class CommandHandler implements CommandExecutor
 				if(args[1].equalsIgnoreCase("wide")) return EnchantPlayerItem(CustomEnchantsManager.WIDE, level, player);
 				if(args[1].equalsIgnoreCase("feedingmodule")) return EnchantPlayerItem(CustomEnchantsManager.FEEDINGMODULE, level, player);
 				if(args[1].equalsIgnoreCase("soulbound")) return EnchantPlayerItem(CustomEnchantsManager.SOULBOUND, level, player);
+				if(args[1].equalsIgnoreCase("splitting")) return EnchantPlayerItem(CustomEnchantsManager.SPLITTING, level, player);
 				if(args[1].equalsIgnoreCase("shadowstep")) return EnchantPlayerItem(CustomEnchantsManager.SHADOWSTEP, level, player);
 				if(args[1].equalsIgnoreCase("replanting")) return EnchantPlayerItem(CustomEnchantsManager.REPLANTING, level, player);
 				
@@ -179,6 +181,17 @@ public class CommandHandler implements CommandExecutor
 			if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.TRAVELER)) {
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				Main.Log("ArmorPoints: " + EventsClass.functions.GetArmorPoints(resultItem.getType()));
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed", itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.LEGS));
 				itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 				resultItem.setItemMeta(itemMeta);
@@ -186,6 +199,16 @@ public class CommandHandler implements CommandExecutor
 			if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.STONEFISTS)) {
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
 				itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 				resultItem.setItemMeta(itemMeta);
@@ -193,6 +216,16 @@ public class CommandHandler implements CommandExecutor
 			if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.HEALTHBOOST)) {
 				ItemMeta itemMeta = resultItem.getItemMeta();
 				itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+				itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+				if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+					itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+				
 				itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2, AttributeModifier.Operation.ADD_NUMBER));
 				itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 				resultItem.setItemMeta(itemMeta);
@@ -229,6 +262,17 @@ public class CommandHandler implements CommandExecutor
 		if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.TRAVELER)) {
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			Main.Log("ArmorPoints: " + EventsClass.functions.GetArmorPoints(resultItem.getType()));
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS));
+			
 			itemMeta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(UUID.randomUUID(), "generic.movementSpeed", itemMeta.getEnchantLevel(CustomEnchantsManager.TRAVELER) * .4, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.LEGS));
 			itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			resultItem.setItemMeta(itemMeta);
@@ -236,6 +280,15 @@ public class CommandHandler implements CommandExecutor
 		if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.STONEFISTS)) {
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
 			itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(UUID.randomUUID(), "generic.attackDamage", itemMeta.getEnchantLevel(CustomEnchantsManager.STONEFISTS) * 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
 			itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			resultItem.setItemMeta(itemMeta);
@@ -243,6 +296,16 @@ public class CommandHandler implements CommandExecutor
 		if(resultItem.getItemMeta().hasEnchant(CustomEnchantsManager.HEALTHBOOST)) {
 			ItemMeta itemMeta = resultItem.getItemMeta();
 			itemMeta.removeAttributeModifier(Attribute.GENERIC_MAX_HEALTH);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS);
+			itemMeta.removeAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+			if(EventsClass.functions.GetArmorPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(UUID.randomUUID(), "generic.armor", EventsClass.functions.GetArmorPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetToughnessPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", EventsClass.functions.GetToughnessPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			if(EventsClass.functions.GetKnockbackPoints(resultItem.getType()) > 0)
+				itemMeta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.randomUUID(), "generic.knockbackResistance", EventsClass.functions.GetKnockbackPoints(resultItem.getType()), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST));
+			
 			itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", itemMeta.getEnchantLevel(CustomEnchantsManager.HEALTHBOOST) * 2, AttributeModifier.Operation.ADD_NUMBER));
 			itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			resultItem.setItemMeta(itemMeta);

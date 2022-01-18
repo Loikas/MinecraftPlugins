@@ -30,6 +30,7 @@ public class EnchantmentInformation
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 32), null), //replanting
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 64), null), //shadowstep
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 64), new ItemStack(Material.DIAMOND, 48)), //soulbound
+			new DoubleItemStack(new ItemStack(Material.EMERALD, 32), new ItemStack(Material.DIAMOND, 32)), //splitting
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 64), new ItemStack(Material.DIAMOND, 48)), //stepping
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 64), new ItemStack(Material.NETHERITE_SCRAP, 16)), //stonefists
 			new DoubleItemStack(new ItemStack(Material.EMERALD, 64), new ItemStack(Material.NETHERITE_SCRAP, 8)), //thermalplating
@@ -63,6 +64,7 @@ public class EnchantmentInformation
 		new StringList(new String[] { "Whenever you right click a full grown crop", "it automatically replants it" }),//replanting
 		new StringList(new String[] { "Makes it harder for mobs to hear you", "Decreases follow distance" }),//shadowstep
 		new StringList(new String[] { "Preserve your item on death.", "You will keep all items with soulbound", "after you die.", }), //soulbound
+		new StringList(new String[] { "Shoots arrows to all nearby", "mobs when you hit a mob." }), //splitting
 		new StringList(new String[] { "Makes it easier to walk up", "single blocks" }),//stepping
 		new StringList(new String[] { "Increase your attack damage significantly"}), //stonefists
 		new StringList(new String[] { "Get permanent fire resistance", "BUT ONLY IF EVERY ARMOR PIECE", "HAS THE ENCHANT" }), //thermalplating
@@ -96,6 +98,7 @@ public class EnchantmentInformation
 		new StringList(new String[] { "- Hoe's"}),//replanting
 		new StringList(new String[] { "- Boots"}),//shadowstep
 		new StringList(new String[] { "- All enchantable items"}), //soulbound
+		new StringList(new String[] { "- Bows"}), //splitting
 		new StringList(new String[] { "- Boots"}),//stepping
 		new StringList(new String[] { "- Chestplates", "- Elytra's"}), //stonefists
 		new StringList(new String[] { "- Helmets", "- Chestplates", "- Leggings", "- Boots"}), //thermalplating
@@ -129,6 +132,7 @@ public class EnchantmentInformation
 			new StringList(new String[] { "- Wide"}),//replanting
 			new StringList(new String[] { "- Assassin"}),//shadowstep
 			new StringList(new String[] { "- Nothing"}),//soulbound
+			new StringList(new String[] { "- Nothing"}),//splitting
 			new StringList(new String[] { "- Leaping"}),//stepping
 			new StringList(new String[] { "- Nothing"}),//stonefists
 			new StringList(new String[] { "- Elemental Protection"}),//thermalplating

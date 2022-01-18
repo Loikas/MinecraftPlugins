@@ -58,7 +58,7 @@ public class InventoryManager implements Listener
 		ItemMeta enchMeta = enchBook.getItemMeta();
 		List<String> lore = new ArrayList<>();
 		lore.add("§fThe recipe for the enchantment book");
-		lore.add("§fneeded in all custom recipes.");
+		lore.add("§fneeded in all level 1 custom recipes.");
 		enchMeta.setLore(lore);
 		enchBook.setItemMeta(enchMeta);
 		customChoose.setItem(8, enchBook);
