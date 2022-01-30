@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -24,14 +25,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.SmokingRecipe;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import me.Loikas.ExpandedEnchants.Commands.CommandHandler;
 import me.Loikas.ExpandedEnchants.Commands.CustomEnchantsTabCompleter;
 import me.Loikas.ExpandedEnchants.Inventories.InventoryManager;
+import me.Loikas.ExpandedEnchants.UpdateChecker.UpdateChecker;
 import me.Loikas.ExpandedEnchants.Util.AssassinInfo;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import net.milkbowl.vault.economy.Economy;
+
 
 public class Main extends JavaPlugin
 {
@@ -43,12 +50,12 @@ public class Main extends JavaPlugin
 	public static ItemManager itemManager;
 	public static InventoryManager inventoryManager;
 	
+	public static Economy econ;
 	
 	public static ArrayList<CustomEnchantmentRecipe> customRecipes = new ArrayList<CustomEnchantmentRecipe>();
 	
-	private static boolean DoDebug = false;
 	public static void Log(String message) {
-		if(DoDebug) Bukkit.getServer().getConsoleSender().sendMessage(message);
+		if(getPlugin().getConfig().getBoolean("debug", false)) Bukkit.getServer().getConsoleSender().sendMessage(message);
 	}
 	
 	@Override
@@ -57,9 +64,23 @@ public class Main extends JavaPlugin
 		plugin = this;
 		
 		this.saveDefaultConfig();
+		setupEconomy();
+		
+		if (!this.getConfig().getBoolean("EnableVaultIntegration")) { Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": Vault integration disabled."); econ = null; }
+		else if(econ == null) Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": Vault not found. Starting ExpandedEnchants without Vault.");
+		else Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": Vault found. Enabling ExpandedEnchants integration with Vault.");
 		
 		itemManager = new ItemManager();
-		this.saveResource("SaveData.yml", false);
+	
+			try
+			{
+				new YamlConfiguration().load("plugins/ExpandedEnchants/SaveData.yml");
+			} catch (IOException | InvalidConfigurationException e)
+			{
+				this.saveResource("SaveData.yml", false);
+			} 
+	
+		CustomEnchantsManager.custom_enchants = new ArrayList<>();
 		AddAllCustomEnchants();
 		RegisterRecipes();
 		
@@ -68,6 +89,8 @@ public class Main extends JavaPlugin
 		eventsClass = new EventsClass();
 		recipeManager = new RecipeManager(); 
 		inventoryManager = new InventoryManager();
+		
+		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": Found " + ChatColor.LIGHT_PURPLE + EventsClass.functions.GetEnabledEnchants().size() + ChatColor.WHITE + " enabled custom enchantments!");
 		
 		this.getServer().getPluginManager().registerEvents(eventsClass, this);
 		this.getServer().getPluginManager().registerEvents(inventoryManager, this);
@@ -81,13 +104,64 @@ public class Main extends JavaPlugin
 				eventsClass.ConstantCheckMethods();
 			}
 		}.runTaskTimer(this, 0, 20);
-		
 		HandleLoadMaps();
+		
+		Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+		if(board.getTeam(ChatColor.BLACK + "ee_oresight_coal") == null)  {
+			Team team = board.registerNewTeam(ChatColor.BLACK + "ee_oresight_coal");
+			team.setColor(ChatColor.BLACK);
+		}
+		if(board.getTeam(ChatColor.GOLD + "ee_oresight_iron") == null)  {
+			Team team = board.registerNewTeam(ChatColor.GOLD + "ee_oresight_iron");
+			team.setColor(ChatColor.GOLD);
+		}
+		if(board.getTeam(ChatColor.RED + "ee_oresight_copper") == null) {
+			Team team = board.registerNewTeam(ChatColor.RED + "ee_oresight_copper");
+			team.setColor(ChatColor.RED);
+		}
+		if(board.getTeam(ChatColor.YELLOW + "ee_oresight_gold") == null)  {
+			Team team = board.registerNewTeam(ChatColor.YELLOW + "ee_oresight_gold");
+			team.setColor(ChatColor.YELLOW);
+		}
+		if(board.getTeam(ChatColor.DARK_RED + "ee_oresight_redstone") == null)  {
+			Team team = board.registerNewTeam(ChatColor.DARK_RED + "ee_oresight_redstone");
+			team.setColor(ChatColor.DARK_RED);
+		}
+		if(board.getTeam(ChatColor.DARK_BLUE + "ee_oresight_lapis") == null)  {
+			Team team = board.registerNewTeam(ChatColor.DARK_BLUE+ "ee_oresight_lapis");
+			team.setColor(ChatColor.DARK_BLUE);
+		}
+		if(board.getTeam(ChatColor.AQUA + "ee_oresight_diamond") == null)  {
+			Team team = board.registerNewTeam(ChatColor.AQUA + "ee_oresight_diamond");
+			team.setColor(ChatColor.AQUA);
+		}
+		if(board.getTeam(ChatColor.GREEN + "ee_oresight_emerald") == null)  {
+			Team team = board.registerNewTeam(ChatColor.GREEN + "ee_oresight_emerald");
+			team.setColor(ChatColor.GREEN);
+		}
+		if(board.getTeam(ChatColor.RED + "ee_oresight_debris") == null)  {
+			Team team = board.registerNewTeam(ChatColor.RED + "ee_oresight_debris");
+			team.setColor(ChatColor.RED);
+		}
+		if(getPlugin().getConfig().getBoolean("EnableUpdateCheck"))
+			UpdateChecker.init(this, 98780).setDownloadLink(98780).setDonationLink("https://www.buymeacoffee.com/loikas").setChangelogLink("https://www.spigotmc.org/resources/expandedenchants.98780/updates").setNotifyOpsOnJoin(true).checkNow();
 	}
 	
 	public static Main getPlugin() {
 		return plugin;
 	}
+	
+	private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
 	
 	@Override
 	public void onDisable() 
@@ -105,15 +179,26 @@ public class Main extends JavaPlugin
 		eventsClass = null;
 		itemManager = null;
 		recipeManager = null;
-		inventoryManager = null;
+		inventoryManager = null;		
+		
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.BLACK + "ee_oresight_coal").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.RED + "ee_oresight_copper").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.GOLD + "ee_oresight_iron").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.YELLOW + "ee_oresight_gold").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.DARK_BLUE + "ee_oresight_lapis").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.DARK_RED + "ee_oresight_redstone").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.AQUA + "ee_oresight_diamond").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.GREEN + "ee_oresight_emerald").unregister();
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(ChatColor.RED + "ee_oresight_debris").unregister();
 	}
 	
 	FileConfiguration saveData;
 	
 	public void HandleSaveMaps() throws IOException {
 		saveData = new YamlConfiguration();
+		this.saveResource("SaveData.yml", true);
 		try { saveData.load("plugins/ExpandedEnchants/SaveData.yml"); }
-		catch (IOException | InvalidConfigurationException e) { e.printStackTrace(); }
+		catch (IOException | InvalidConfigurationException e) { this.saveResource("SaveData.yml", true); }
 		
 		saveData.options().header("DO NOT EDIT THIS FILE");
 		saveData.set("soulbound", null);
@@ -136,6 +221,14 @@ public class Main extends JavaPlugin
 		saveData.set("deflect", null);
 		for(Map.Entry<UUID, Integer> entry : eventsClass.deflectCountdown.entrySet()) {
 			saveData.set("deflect." + entry.getKey(), entry.getValue());
+		}
+		saveData.set("thrust", null);
+		for(Map.Entry<UUID, Integer> entry : eventsClass.thrustCooldown.entrySet()) {
+			saveData.set("thrust." + entry.getKey(), entry.getValue());
+		}
+		saveData.set("oresight", null);
+		for(Map.Entry<UUID, Integer> entry : eventsClass.spawnedShulkers.entrySet()) {
+			saveData.set("oresight." + entry.getKey(), entry.getValue());
 		}
 		saveData.set("freeze", null);
 		for(Map.Entry<UUID, Double> entry : eventsClass.canFreeze.entrySet()) {
@@ -166,7 +259,7 @@ public class Main extends JavaPlugin
 	public void HandleLoadMaps() {
 		saveData = new YamlConfiguration();
 		try { saveData.load("plugins/ExpandedEnchants/SaveData.yml"); }
-		catch (IOException | InvalidConfigurationException e) { e.printStackTrace(); }
+		catch (IOException | InvalidConfigurationException e) { Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.RED + ": Couldn't find SaveData.yml file. No data can be loaded."); }
 		
 		if(saveData.getConfigurationSection("soulbound") != null) saveData.getConfigurationSection("soulbound").getKeys(false).forEach(key ->{
 			ArrayList<ItemStack> items = ((ArrayList<ItemStack>) saveData.get("soulbound." + key));
@@ -201,6 +294,14 @@ public class Main extends JavaPlugin
 		if(saveData.getConfigurationSection("deflect") != null) saveData.getConfigurationSection("deflect").getKeys(false).forEach(key ->{
 			int num = ((Integer) saveData.get("deflect." + key));
 			eventsClass.deflectCountdown.put(UUID.fromString(key), num);
+		});
+		if(saveData.getConfigurationSection("thrust") != null) saveData.getConfigurationSection("thrust").getKeys(false).forEach(key ->{
+			int num = ((Integer) saveData.get("thrust." + key));
+			eventsClass.thrustCooldown.put(UUID.fromString(key), num);
+		});
+		if(saveData.getConfigurationSection("oresight") != null) saveData.getConfigurationSection("oresight").getKeys(false).forEach(key ->{
+			int num = ((Integer) saveData.get("oresight." + key));
+			eventsClass.spawnedShulkers.put(UUID.fromString(key), num);
 		});
 		if(saveData.getConfigurationSection("freeze") != null) saveData.getConfigurationSection("freeze").getKeys(false).forEach(key ->{
 			Double num = ((Double) saveData.get("freeze." + key));
@@ -250,8 +351,8 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.DISARMING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.DISRUPTION);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.ELEMENTALPROTECTION);
-		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.OWLEYES);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.EXP_BOOST);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.OWLEYES);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.FEEDINGMODULE);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.GOURMAND);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.HEALTHBOOST);
@@ -261,6 +362,7 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.LEAPING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.LIFESTEAL);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.LUMBERJACK);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.ORESIGHT);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.REPLANTING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SHADOWSTEP);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.SOULBOUND);
@@ -268,12 +370,12 @@ public class Main extends JavaPlugin
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STEPPING);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.STONEFISTS);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.THERMALPLATING);
+		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.THRUSTERS);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.TRAVELER);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.NOBREAKABLE);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.VEINMINE);
 		CustomEnchantsManager.custom_enchants.add(CustomEnchantsManager.WIDE);		
 	}
-	
 	public void RegisterRecipes() {
 		if(getPlugin().getConfig().getBoolean("LeatherSmeltEnabled")){
 			FurnaceRecipe leathersmelt = new FurnaceRecipe(NamespacedKey.minecraft("ee_recipe_leather_smelt"), new ItemStack(Material.LEATHER, 1), Material.ROTTEN_FLESH, 1.0f, 5 * 20);
@@ -292,6 +394,75 @@ public class Main extends JavaPlugin
 		bookrecipe.addIngredient(Material.EMERALD);
 		Bukkit.getServer().addRecipe(bookrecipe);
 		
+		
+		if(getPlugin().getConfig().getBoolean("ThrustersEnabled"))
+		{
+			ShapedRecipe recipe = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_thrusters"), itemManager.CreateCustomBook(CustomEnchantsManager.THRUSTERS, 1));
+			recipe.shape("ABC","DEF", "GHI");
+			Integer[] amounts = new Integer[9];
+			boolean doDefault = false;
+			if(recipeData != null) { 
+				if(recipeData.getConfigurationSection("ee_recipe_thrusters") != null) {
+					recipe.setIngredient('A', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("A", "AIR")));
+					recipe.setIngredient('B', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("B", "AIR")));
+					recipe.setIngredient('C', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("C", "AIR")));
+					recipe.setIngredient('D', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("D", "AIR")));
+					recipe.setIngredient('E', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("E", "AIR")));
+					recipe.setIngredient('F', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("F", "AIR")));
+					recipe.setIngredient('G', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("G", "AIR")));
+					recipe.setIngredient('H', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("H", "AIR")));
+					recipe.setIngredient('I', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_thrusters.Ingredients").getString("I", "AIR")));
+					List<Integer> ints = recipeData.getConfigurationSection("ee_recipe_thrusters").getIntegerList("Amounts");
+					amounts = new Integer[] {ints.get(0), ints.get(1), ints.get(2), ints.get(3), ints.get(4), ints.get(5), ints.get(6), ints.get(7), ints.get(8)};
+				}
+				else doDefault = true;
+			}
+			else doDefault = true;
+			if(doDefault) {
+				recipe.setIngredient('B', Material.ELYTRA);
+				recipe.setIngredient('D', Material.FIREWORK_ROCKET);
+				recipe.setIngredient('E', Material.ENCHANTED_BOOK);
+				recipe.setIngredient('F', Material.FIREWORK_ROCKET);
+				recipe.setIngredient('H', Material.LAPIS_LAZULI);
+				amounts = new Integer[] { 0, 1, 0, 32, 1, 32, 0, 16, 0 };
+			}
+			customRecipes.add(new CustomEnchantmentRecipe(recipe, amounts));
+			Bukkit.getServer().addRecipe(recipe);	
+		}
+		if(getPlugin().getConfig().getBoolean("OresightEnabled"))
+		{
+			ShapedRecipe recipe = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_oresight"), itemManager.CreateCustomBook(CustomEnchantsManager.ORESIGHT, 1));
+			recipe.shape("ABC","DEF", "GHI");
+			Integer[] amounts = new Integer[9];
+			boolean doDefault = false;
+			if(recipeData != null) { 
+				if(recipeData.getConfigurationSection("ee_recipe_oresight") != null) {
+					recipe.setIngredient('A', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("A", "AIR")));
+					recipe.setIngredient('B', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("B", "AIR")));
+					recipe.setIngredient('C', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("C", "AIR")));
+					recipe.setIngredient('D', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("D", "AIR")));
+					recipe.setIngredient('E', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("E", "AIR")));
+					recipe.setIngredient('F', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("F", "AIR")));
+					recipe.setIngredient('G', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("G", "AIR")));
+					recipe.setIngredient('H', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("H", "AIR")));
+					recipe.setIngredient('I', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_oresight.Ingredients").getString("I", "AIR")));
+					List<Integer> ints = recipeData.getConfigurationSection("ee_recipe_oresight").getIntegerList("Amounts");
+					amounts = new Integer[] {ints.get(0), ints.get(1), ints.get(2), ints.get(3), ints.get(4), ints.get(5), ints.get(6), ints.get(7), ints.get(8)};
+				}
+				else doDefault = true;
+			}
+			else doDefault = true;
+			if(doDefault) {
+				recipe.setIngredient('B', Material.NETHERITE_INGOT);
+				recipe.setIngredient('D', Material.IRON_BLOCK);
+				recipe.setIngredient('E', Material.ENCHANTED_BOOK);
+				recipe.setIngredient('F', Material.DIAMOND_ORE);
+				recipe.setIngredient('H', Material.LAPIS_LAZULI);
+				amounts = new Integer[] { 0, 1, 0, 10, 1, 10, 0, 16, 0 };
+			}
+			customRecipes.add(new CustomEnchantmentRecipe(recipe, amounts));
+			Bukkit.getServer().addRecipe(recipe);	
+		}
 		if(getPlugin().getConfig().getBoolean("AntigravityEnabled"))
 		{
 			ShapedRecipe recipe = new ShapedRecipe(NamespacedKey.minecraft("ee_recipe_antigravity"), itemManager.CreateCustomBook(CustomEnchantsManager.ANTIGRAVITY, 1));
@@ -310,7 +481,7 @@ public class Main extends JavaPlugin
 					recipe.setIngredient('H', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_antigravity.Ingredients").getString("H", "AIR")));
 					recipe.setIngredient('I', Material.valueOf(recipeData.getConfigurationSection("ee_recipe_antigravity.Ingredients").getString("I", "AIR")));
 					List<Integer> ints = recipeData.getConfigurationSection("ee_recipe_antigravity").getIntegerList("Amounts");
-					amounts = new Integer[] {ints.get(0), ints.get(1), ints.get(2), ints.get(3), ints.get(4), ints.get(5), ints.get(6), ints.get(7), ints.get(8),};
+					amounts = new Integer[] {ints.get(0), ints.get(1), ints.get(2), ints.get(3), ints.get(4), ints.get(5), ints.get(6), ints.get(7), ints.get(8)};
 				}
 				else doDefault = true;
 			}

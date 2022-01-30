@@ -3,7 +3,9 @@ package me.Loikas.ExpandedEnchants.Util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -15,6 +17,22 @@ import me.Loikas.ExpandedEnchants.Main;
 
 public class Functions
 {
+	
+	public List<Block> GetBlocksInBox(List<Block> list, Location origin, int radius, Material type) {
+		for (int x = -radius; x < radius; x++)
+		{
+			for (int y = -radius; y < radius; y++)
+			{
+				for (int z = -radius; z < radius; z++)
+				{
+					Block bl = origin.getBlock().getRelative(x, y, z);
+					if(bl.getType().equals(type)) list.add(bl);
+				}
+			}
+		}
+		
+		return list;
+	}
 	
 	public boolean ContainsSmeltable(List<Item> items) {
 		for(Item item : items) {
@@ -101,6 +119,12 @@ public class Functions
 		return Math.random() * (max - min) + min;
 	}
 	
+	public int Factorialize(int num) {
+		if(num < 0) return -1;
+		else if (num == 0) return 1;
+		else return (num * Factorialize(num - 1));
+	}
+	
 	public int GetArmorPoints(Material mat) {
 		switch (mat)
 		{
@@ -154,8 +178,8 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("DirectEnabled")) enchs.add(CustomEnchantsManager.DISARMING);
 		if(Main.getPlugin().getConfig().getBoolean("DirectEnabled")) enchs.add(CustomEnchantsManager.DISRUPTION);
 		if(Main.getPlugin().getConfig().getBoolean("ElementalprotectionEnabled")) enchs.add(CustomEnchantsManager.ELEMENTALPROTECTION);
-		if(Main.getPlugin().getConfig().getBoolean("EyesofowlEnabled")) enchs.add(CustomEnchantsManager.OWLEYES);
 		if(Main.getPlugin().getConfig().getBoolean("ExperienceboostEnabled")) enchs.add(CustomEnchantsManager.EXP_BOOST);
+		if(Main.getPlugin().getConfig().getBoolean("EyesofowlEnabled")) enchs.add(CustomEnchantsManager.OWLEYES);
 		if(Main.getPlugin().getConfig().getBoolean("FeedingmoduleEnabled")) enchs.add(CustomEnchantsManager.FEEDINGMODULE);
 		if(Main.getPlugin().getConfig().getBoolean("GourmandEnabled")) enchs.add(CustomEnchantsManager.GOURMAND);
 		if(Main.getPlugin().getConfig().getBoolean("HealthboostEnabled")) enchs.add(CustomEnchantsManager.HEALTHBOOST);
@@ -165,6 +189,7 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("LeapingEnabled")) enchs.add(CustomEnchantsManager.LEAPING);
 		if(Main.getPlugin().getConfig().getBoolean("LifestealEnabled")) enchs.add(CustomEnchantsManager.LIFESTEAL);
 		if(Main.getPlugin().getConfig().getBoolean("LumberjackEnabled")) enchs.add(CustomEnchantsManager.LUMBERJACK);
+		if(Main.getPlugin().getConfig().getBoolean("OresightEnabled")) enchs.add(CustomEnchantsManager.ORESIGHT);
 		if(Main.getPlugin().getConfig().getBoolean("ReplantingEnabled")) enchs.add(CustomEnchantsManager.REPLANTING);
 		if(Main.getPlugin().getConfig().getBoolean("ShadowstepEnabled")) enchs.add(CustomEnchantsManager.SHADOWSTEP);
 		if(Main.getPlugin().getConfig().getBoolean("SoulboundEnabled")) enchs.add(CustomEnchantsManager.SOULBOUND);
@@ -172,6 +197,7 @@ public class Functions
 		if(Main.getPlugin().getConfig().getBoolean("SteppingEnabled")) enchs.add(CustomEnchantsManager.STEPPING);
 		if(Main.getPlugin().getConfig().getBoolean("StonefistsEnabled")) enchs.add(CustomEnchantsManager.STONEFISTS);
 		if(Main.getPlugin().getConfig().getBoolean("ThermalplatingEnabled")) enchs.add(CustomEnchantsManager.THERMALPLATING);
+		if(Main.getPlugin().getConfig().getBoolean("ThrustersEnabled")) enchs.add(CustomEnchantsManager.THRUSTERS);
 		if(Main.getPlugin().getConfig().getBoolean("TravelerEnabled")) enchs.add(CustomEnchantsManager.TRAVELER);
 		if(Main.getPlugin().getConfig().getBoolean("UnbreakableEnabled")) enchs.add(CustomEnchantsManager.NOBREAKABLE);
 		if(Main.getPlugin().getConfig().getBoolean("VeinmineEnabled")) enchs.add(CustomEnchantsManager.VEINMINE);

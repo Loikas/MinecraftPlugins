@@ -34,8 +34,10 @@ public class CustomEnchantmentRecipe
 			if(topItem != null) {
 			if(topItem.getType() == Material.POTION || topItem.getType() == Material.LINGERING_POTION || topItem.getType() == Material.SPLASH_POTION || topItem.getType() == Material.ENCHANTED_BOOK) {
 				itemlist[i] = Main.itemManager.GetSpecialCraftItem(recipe);
+				itemlist[i].setAmount(amounts[i]);
 			}
 			else itemlist[i] = topItem;
+			if(itemlist[i] != null) itemlist[i].setAmount(amounts[i]);
 			}
 		}
 		for(int i = 0; i < 3; i++) {
@@ -44,6 +46,7 @@ public class CustomEnchantmentRecipe
 				continue;
 			}
 			itemlist[i + 3] = recipe.getIngredientMap().get(line2[i]);
+			if(itemlist[i + 3] != null) itemlist[i + 3].setAmount(amounts[i + 3]);
 		}
 		for(int i = 0; i < 3; i++) {
 			if(line3[i] == ' ') {
@@ -51,6 +54,7 @@ public class CustomEnchantmentRecipe
 				continue;
 			}
 			itemlist[i + 6] = recipe.getIngredientMap().get(line3[i]);
+			if(itemlist[i + 6] != null) itemlist[i + 6].setAmount(amounts[i + 6]);
 		}
 		items = itemlist;
 	}

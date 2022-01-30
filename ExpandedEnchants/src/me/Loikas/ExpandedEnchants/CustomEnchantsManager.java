@@ -9,72 +9,43 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 
-import me.Loikas.ExpandedEnchants.Enchants.AntiGravityEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.AssassinEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.AutoSmeltEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.BeheadingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.DeflectEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.DirectEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.DisarmingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.DisruptionEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.ElementalProtectionEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.ExpBoostEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.FeedingModuleEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.GourmandEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.HealthBoostEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.HeavensLightnessEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.IcyEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.LavaWalkerEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.LeapingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.LifestealEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.LumberjackEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.OwlEyesEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.ReplantingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.ShadowStepEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.SoulboundEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.SplittingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.SteppingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.StoneFistsEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.ThermalPlatingEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.TravelerEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.UnbreakableEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.VeinmineEnchantment;
-import me.Loikas.ExpandedEnchants.Enchants.WideEnchantment;
+import me.Loikas.ExpandedEnchants.Enchants.*;
 
 public class CustomEnchantsManager
 {
-	public static final Enchantment ASSASSIN = new AssassinEnchantment("ee_assassin", "Assassin", 3);
-	public static final Enchantment NOBREAKABLE = new UnbreakableEnchantment("ee_unbreakable", "Unbreakable", 1);
-	public static final Enchantment DIRECT = new DirectEnchantment("ee_direct", "Direct", 1);
-	public static final Enchantment AUTOSMELT = new AutoSmeltEnchantment("ee_autosmelt", "Autosmelt", 1);
 	public static final Enchantment ANTIGRAVITY = new AntiGravityEnchantment("ee_antigravity", "Anti-Gravity", 1);
+	public static final Enchantment ASSASSIN = new AssassinEnchantment("ee_assassin", "Assassin", 3);
+	public static final Enchantment AUTOSMELT = new AutoSmeltEnchantment("ee_autosmelt", "Autosmelt", 1);
 	public static final Enchantment BEHEADING = new BeheadingEnchantment("ee_beheading", "Beheading", 5);
-	public static final Enchantment EXP_BOOST = new ExpBoostEnchantment("ee_expboost", "Experience Boost", 5);
-	public static final Enchantment LAVA_WALKER = new LavaWalkerEnchantment("ee_lavawalker", "Lava Walker", 1);
-	public static final Enchantment TRAVELER = new TravelerEnchantment("ee_traveler", "Traveler", 3);
-	public static final Enchantment HEALTHBOOST = new HealthBoostEnchantment("ee_healthboost", "Health Boost", 5);
-	public static final Enchantment STONEFISTS = new StoneFistsEnchantment("ee_stonefists", "Stone Fists", 3);
-	public static final Enchantment LEAPING = new LeapingEnchantment("ee_leaping", "Leaping", 3);
-	public static final Enchantment OWLEYES = new OwlEyesEnchantment("ee_owleyes", "Eyes of Owl", 1);
-	public static final Enchantment HEAVENSLIGHTNESS = new HeavensLightnessEnchantment("ee_heavenslightness", "Heaven's Lightness", 1);
-	public static final Enchantment THERMALPLATING = new ThermalPlatingEnchantment("ee_thermalplating", "Thermal Plating", 1);
-	public static final Enchantment LIFESTEAL = new LifestealEnchantment("ee_lifesteal", "Lifesteal", 3);
-	public static final Enchantment ICY = new IcyEnchantment("ee_icy", "Icy", 5);
 	public static final Enchantment DEFLECT = new DeflectEnchantment("ee_deflect", "Deflect", 4);
-	public static final Enchantment LUMBERJACK = new LumberjackEnchantment("ee_lumberjack", "Lumberjack", 5);
-	public static final Enchantment VEINMINE = new VeinmineEnchantment("ee_veinmine", "Vein Miner", 5);
-	public static final Enchantment WIDE = new WideEnchantment("ee_wide", "Wide", 1);
+	public static final Enchantment DIRECT = new DirectEnchantment("ee_direct", "Direct", 1);
+	public static final Enchantment DISARMING = new DisarmingEnchantment("ee_disarming", "Disarming", 4);
+	public static final Enchantment DISRUPTION = new DisruptionEnchantment("ee_disruption", "Disruption", 3);
+	public static final Enchantment ELEMENTALPROTECTION = new ElementalProtectionEnchantment("ee_elemental", "Elemental Protection", 3);
+	public static final Enchantment OWLEYES = new OwlEyesEnchantment("ee_owleyes", "Eyes of Owl", 1);
+	public static final Enchantment EXP_BOOST = new ExpBoostEnchantment("ee_expboost", "Experience Boost", 5);
 	public static final Enchantment FEEDINGMODULE = new FeedingModuleEnchantment("ee_feedingmodule", "Feeding Module", 1);
-	public static final Enchantment STEPPING = new SteppingEnchantment("ee_stepping", "Stepping", 1);
 	public static final Enchantment GOURMAND = new GourmandEnchantment("ee_gourmand", "Gourmand", 2);
+	public static final Enchantment HEALTHBOOST = new HealthBoostEnchantment("ee_healthboost", "Health Boost", 5);
+	public static final Enchantment HEAVENSLIGHTNESS = new HeavensLightnessEnchantment("ee_heavenslightness", "Heaven's Lightness", 1);
+	public static final Enchantment ICY = new IcyEnchantment("ee_icy", "Icy", 5);
+	public static final Enchantment LAVA_WALKER = new LavaWalkerEnchantment("ee_lavawalker", "Lava Walker", 1);
+	public static final Enchantment LEAPING = new LeapingEnchantment("ee_leaping", "Leaping", 3);
+	public static final Enchantment LIFESTEAL = new LifestealEnchantment("ee_lifesteal", "Lifesteal", 3);
+	public static final Enchantment LUMBERJACK = new LumberjackEnchantment("ee_lumberjack", "Lumberjack", 5);
+	public static final Enchantment ORESIGHT = new OresightEnchantment("ee_oresight", "Oresight", 6);
+	public static final Enchantment REPLANTING = new ReplantingEnchantment("ee_replanting", "Replanting", 1);
 	public static final Enchantment SHADOWSTEP = new ShadowStepEnchantment("ee_shadowstep", "Shadow Step", 5);
 	public static final Enchantment SOULBOUND = new SoulboundEnchantment("ee_soulbound", "Soulbound", 1);
 	public static final Enchantment SPLITTING = new SplittingEnchantment("ee_splitting", "Splitting", 3);
-	public static final Enchantment REPLANTING = new ReplantingEnchantment("ee_replanting", "Replanting", 1);
-	public static final Enchantment ELEMENTALPROTECTION = new ElementalProtectionEnchantment("ee_elemental", "Elemental Protection", 3);
-	public static final Enchantment DISARMING = new DisarmingEnchantment("ee_disarming", "Disarming", 4);
-	public static final Enchantment DISRUPTION = new DisruptionEnchantment("ee_disruption", "Disruption", 3);
-	
+	public static final Enchantment STEPPING = new SteppingEnchantment("ee_stepping", "Stepping", 1);
+	public static final Enchantment STONEFISTS = new StoneFistsEnchantment("ee_stonefists", "Stone Fists", 3);
+	public static final Enchantment THERMALPLATING = new ThermalPlatingEnchantment("ee_thermalplating", "Thermal Plating", 1);
+	public static final Enchantment THRUSTERS = new ThrustersEnchantment("ee_thrusters", "Thrusters", 2);
+	public static final Enchantment TRAVELER = new TravelerEnchantment("ee_traveler", "Traveler", 3);
+	public static final Enchantment NOBREAKABLE = new UnbreakableEnchantment("ee_unbreakable", "Unbreakable", 1);
+	public static final Enchantment VEINMINE = new VeinmineEnchantment("ee_veinmine", "Vein Miner", 5);
+	public static final Enchantment WIDE = new WideEnchantment("ee_wide", "Wide", 1);
 	
 	public static ArrayList<Enchantment> custom_enchants = new ArrayList<Enchantment>();
 	
@@ -83,6 +54,7 @@ public class CustomEnchantsManager
 		return -1;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void Register() 
 	{		
 		boolean[] registeredEnchs = new boolean[custom_enchants.size()];
@@ -94,14 +66,18 @@ public class CustomEnchantsManager
 		
 		for(int i = 0; i < custom_enchants.size(); i++) {
 			if(!registeredEnchs[i]) {
-				RegisterEnchantment(custom_enchants.get(i));
+				registeredEnchs[i] = RegisterEnchantment(custom_enchants.get(i));
 			}
 		}
-			
+		boolean allRegistered = true;
+		for(boolean reg : registeredEnchs) if(reg == false) allRegistered = false;
+		if(allRegistered) Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": All enchants were succesfully registered!");
+		else {
+			for(int i = 0 ; i < registeredEnchs.length; i++) if(registeredEnchs[i] == false) Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.RED + ": Couldn't register '" + custom_enchants.get(i).getName() + "'!");
+		}
 	}
-	
-	@SuppressWarnings("deprecation")
-	public static void RegisterEnchantment(Enchantment enchantment) 
+
+	public static boolean RegisterEnchantment(Enchantment enchantment) 
 	{
 		boolean registered = true;
 		try 
@@ -110,13 +86,14 @@ public class CustomEnchantsManager
 			f.setAccessible(true);
 			f.set(null, true);
 			Enchantment.registerEnchantment(enchantment);
+			return registered;
 		} 
 		catch (Exception e)
 		{
 			registered = false;
 			e.printStackTrace();
+			return registered;
 		}
-		if(registered) Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "ExpandedEnchants" + ChatColor.WHITE + ": '"+ enchantment.getName() + "' was succesfully registered!");
 			
 	}
 

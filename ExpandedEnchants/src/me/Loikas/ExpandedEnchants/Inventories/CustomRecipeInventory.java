@@ -101,7 +101,7 @@ public class CustomRecipeInventory implements InventoryHolder
 					inv.setItem(EventsClass.functions.GetSlot(i), Main.itemManager.GetSpecialCraftItem(recipe.recipe));
 				}
 				else { 
-					ItemStack craftItem = new ItemStack(recipe.items[i].getType(), recipe.amounts[i]);
+					ItemStack craftItem = new ItemStack(recipe.items[i]);
 					if(i == 4) if(craftItem.getType() == Material.ENCHANTED_BOOK) {
 						ItemMeta craftMeta = craftItem.getItemMeta();
 						List<String> craftLore = new ArrayList<>(); craftLore.add("§fYou can find the recipe for this"); craftLore.add("§fin the top right in the"); craftLore.add("§fchoose custom recipe menu!");

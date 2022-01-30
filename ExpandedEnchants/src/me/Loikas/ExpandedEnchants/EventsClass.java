@@ -1,9 +1,12 @@
 package me.Loikas.ExpandedEnchants;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,8 +29,12 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -39,7 +46,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.WanderingTrader;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -102,7 +108,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class EventsClass implements Listener
 {
 	public static Functions functions = new Functions();
-
+	
 	@EventHandler
 	public void onPlayerDeathEvent(PlayerDeathEvent e)
 	{
@@ -142,6 +148,7 @@ public class EventsClass implements Listener
 			HandleVeinmineEnchant(event);
 		if (Main.getPlugin().getConfig().getBoolean("WideEnabled"))
 			HandleWideEnchant(event);
+		CheckForShulker(event);
 	}
 
 	@EventHandler
@@ -285,6 +292,8 @@ public class EventsClass implements Listener
 	@EventHandler
 	public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent e) {
 		if(Main.getPlugin().getConfig().getBoolean("AssassinEnabled")) HandleAssassinEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("OresightEnabled")) HandleOresightEnchant(e);
+		if(Main.getPlugin().getConfig().getBoolean("ThrustersEnabled")) HandleThrustersEnchant(e);
 	}
 	
 	@EventHandler
@@ -375,8 +384,175 @@ public class EventsClass implements Listener
 		});
 	}
 	
+	HashMap<UUID, Integer> spawnedShulkers = new HashMap<>();
+	public void HandleOresightEnchant(PlayerToggleSneakEvent e) {
+		if(!e.isSneaking()) return;
+		Player player = e.getPlayer();
+		if (player == null) return;
+		if (player.getInventory().getHelmet() == null) return;
+		if (!player.getInventory().getHelmet().hasItemMeta()) return;
+		if (!player.getInventory().getHelmet().getItemMeta().hasEnchant(CustomEnchantsManager.ORESIGHT)) return;
+		
+		int level = player.getInventory().getHelmet().getItemMeta().getEnchantLevel(CustomEnchantsManager.ORESIGHT);
+
+		if(level == 1) {
+			List<Block> coalBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(coalBlocks, player.getLocation(), 10, Material.COAL_ORE);
+			functions.GetBlocksInBox(coalBlocks, player.getLocation(), 10, Material.DEEPSLATE_COAL_ORE);
+			for (Block block : coalBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.BLACK, "ee_oresight_coal");
+			}
+		}
+		if(level == 2) {
+			List<Block> ironBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(ironBlocks, player.getLocation(), 10, Material.IRON_ORE);
+			functions.GetBlocksInBox(ironBlocks, player.getLocation(), 10, Material.DEEPSLATE_IRON_ORE);
+			for (Block block : ironBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.GOLD, "ee_oresight_iron");
+			}
+			List<Block> copperBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(copperBlocks, player.getLocation(), 10, Material.COPPER_ORE);
+			functions.GetBlocksInBox(copperBlocks, player.getLocation(), 10, Material.DEEPSLATE_COPPER_ORE);
+			for (Block block : copperBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.RED, "ee_oresight_copper");
+			}
+		}
+		if(level == 3) {
+			List<Block> goldBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(goldBlocks, player.getLocation(), 10, Material.GOLD_ORE);
+			functions.GetBlocksInBox(goldBlocks, player.getLocation(), 10, Material.DEEPSLATE_GOLD_ORE);
+			for (Block block : goldBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.YELLOW, "ee_oresight_gold");
+			}
+		}
+		if(level == 4) {
+			List<Block> redstoneBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(redstoneBlocks, player.getLocation(), 10, Material.REDSTONE_ORE);
+			functions.GetBlocksInBox(redstoneBlocks, player.getLocation(), 10, Material.DEEPSLATE_REDSTONE_ORE);
+			for (Block block : redstoneBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.DARK_RED, "ee_oresight_redstone");
+			}
+			List<Block> lapisBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(lapisBlocks, player.getLocation(), 10, Material.DEEPSLATE_LAPIS_ORE);
+			functions.GetBlocksInBox(lapisBlocks, player.getLocation(), 10, Material.LAPIS_ORE);
+			for (Block block : lapisBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.DARK_BLUE, "ee_oresight_lapis");
+			}
+		}
+		if(level == 5) {
+			List<Block> emeraldBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(emeraldBlocks, player.getLocation(), 10, Material.EMERALD_ORE);
+			functions.GetBlocksInBox(emeraldBlocks, player.getLocation(), 10, Material.DEEPSLATE_EMERALD_ORE);
+			for (Block block : emeraldBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.GREEN, "ee_oresight_emerald");
+			}
+			List<Block> diamondBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(diamondBlocks, player.getLocation(), 10, Material.DEEPSLATE_DIAMOND_ORE);
+			functions.GetBlocksInBox(diamondBlocks, player.getLocation(), 10, Material.DIAMOND_ORE);
+			for (Block block : diamondBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.AQUA, "ee_oresight_diamond");
+				
+			}
+		}
+		if(level == 6) {
+			List<Block> debrisBlocks = new ArrayList<>();
+			functions.GetBlocksInBox(debrisBlocks, player.getLocation(), 10, Material.ANCIENT_DEBRIS);
+			for (Block block : debrisBlocks)
+			{
+				SpawnGlowingShulker(block, ChatColor.RED, "ee_oresight_debris");
+			}
+		}
+	}
+	
+	HashMap<UUID, Integer> thrustCooldown = new HashMap<>();
+	public void HandleThrustersEnchant(PlayerToggleSneakEvent e) {
+		if(!e.getPlayer().isGliding()) return;
+		if(!e.isSneaking()) return;
+		if(!e.getPlayer().getInventory().getChestplate().getItemMeta().hasEnchant(CustomEnchantsManager.THRUSTERS)) return;
+		
+		if(thrustCooldown.containsKey(e.getPlayer().getUniqueId())) {
+			if(thrustCooldown.get(e.getPlayer().getUniqueId()) > 0) {
+				e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR);
+				TextComponent component = new TextComponent(ChatColor.DARK_RED + "Thrusters has a cooldown of " + ChatColor.WHITE + thrustCooldown.get(e.getPlayer().getUniqueId()) + ChatColor.DARK_RED +" seconds left!");
+				//component.setColor(ChatColor.DARK_RED);
+				e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
+				return;
+			}
+		}
+		Location dir = e.getPlayer().getLocation();
+		Vector velo = new Vector(dir.getDirection().getX(), dir.getDirection().getY(), dir.getDirection().getZ()).normalize();
+		int level = e.getPlayer().getInventory().getChestplate().getItemMeta().getEnchantLevel(CustomEnchantsManager.THRUSTERS);
+		Vector newVelo = velo.multiply(level);
+		e.getPlayer().setVelocity(e.getPlayer().getVelocity().normalize().add(newVelo));
+		thrustCooldown.put(e.getPlayer().getUniqueId(), 6 - level);
+
+	}
+	
+	public void CountdownThrust() {
+		for (UUID player : thrustCooldown.keySet())
+		{
+			int oldValue = thrustCooldown.get(player);
+			if (oldValue > 0)
+				thrustCooldown.put(player, oldValue - 1);
+			else
+				oldValue = 0;
+		}
+	}
+	
+	public void SpawnGlowingShulker(Block block, ChatColor color, String teamName) {
+		boolean shouldContinue = true;
+		for (UUID sh : spawnedShulkers.keySet()) if(Bukkit.getEntity(sh).getLocation().getBlock().equals(block)) {
+			shouldContinue = false;
+			spawnedShulkers.put(sh, 15);
+		}
+		if(!shouldContinue) return;
+		Shulker shulker = (Shulker) block.getWorld().spawnEntity(block.getLocation(), EntityType.SHULKER);
+		shulker.setAI(false);
+		shulker.setInvulnerable(true);
+		shulker.setInvisible(true);
+		shulker.setGlowing(true);
+		Bukkit.getScoreboardManager().getMainScoreboard().getTeam(color + teamName).addEntry(shulker.getUniqueId().toString());
+		spawnedShulkers.put(shulker.getUniqueId(), 15);
+	}
+	
+	public void CountdownShulker() {
+		List<UUID> removeShulker = new ArrayList<>();
+		for (UUID ent : spawnedShulkers.keySet())
+		{
+			int oldValue = spawnedShulkers.get(ent);
+			if (oldValue > 0)
+				spawnedShulkers.put(ent, oldValue - 1);
+			
+			else
+				removeShulker.add(ent);
+		}
+		for(UUID uuid : removeShulker) {
+			if(Bukkit.getEntity(uuid) != null) Bukkit.getEntity(uuid).remove();
+			spawnedShulkers.remove(uuid);
+		}
+	}
+	
+	public void CheckForShulker(BlockBreakEvent e) {
+		List<UUID> removeShulker = new ArrayList<>();
+		for (UUID sh : spawnedShulkers.keySet()) if(Bukkit.getEntity(sh).getLocation().getBlock().equals(e.getBlock())) removeShulker.add(sh);
+		
+		for(UUID uuid : removeShulker) {
+			if(Bukkit.getEntity(uuid) != null) Bukkit.getEntity(uuid).remove();
+			spawnedShulkers.remove(uuid);
+		}
+	}
+	
 	public void HandleAssassinEnchant(PlayerToggleSneakEvent e) {
 			Player player = e.getPlayer();
+			if(player.isGliding()) return;
 			if (player.getInventory().getBoots() == null)
 				return;
 			if (player.getInventory().getBoots().getItemMeta() == null)
@@ -826,15 +1002,16 @@ public class EventsClass implements Listener
 		{
 			if (ingredients[i] == null)
 			{
-				if (customRecipe.amounts[i] == 0)
-					continue;
+				if(customRecipe.amounts[i] == 0) continue;
 				else
 				{
 					canCraft = false;
 					break;
 				}
 			}
-			if (customRecipe.amounts[i] > ingredients[i].getAmount())
+			boolean foundHigher = false;
+			for(ItemStack item : customRecipe.items) if(item != null && ingredients[i] != null) if(item.getType().equals(ingredients[i].getType())) if(item.getAmount() > ingredients[i].getAmount()) foundHigher = true;
+			if (foundHigher)
 			{
 				canCraft = false;
 				break;
@@ -848,112 +1025,171 @@ public class EventsClass implements Listener
 	public boolean CheckItemInRecipes(String recipe, ItemStack ingredient)
 	{
 		boolean canCraft = true;
+		boolean[] configResult = null;
 		switch (recipe)
 		{
 		case "minecraft:ee_recipe_owleyes":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_owleyes");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta nightmeta = (PotionMeta) ingredient.getItemMeta();
-			if (nightmeta.getBasePotionData().getType() == PotionType.NIGHT_VISION
-					&& nightmeta.getBasePotionData().isExtended())
-				;
-			else
-				canCraft = false;
+			if (nightmeta.getBasePotionData().getType() == PotionType.NIGHT_VISION && nightmeta.getBasePotionData().isExtended());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_assassin":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_assassin");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta assassin = (PotionMeta) ingredient.getItemMeta();
-			if (assassin.getBasePotionData().getType() == PotionType.INVISIBILITY
-					&& assassin.getBasePotionData().isExtended())
-				;
-			else
-				canCraft = false;
+			if (assassin.getBasePotionData().getType() == PotionType.INVISIBILITY && assassin.getBasePotionData().isExtended());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_elemental":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_elemental");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta elementalMeta = (PotionMeta) ingredient.getItemMeta();
-			if (elementalMeta.getBasePotionData().getType() == PotionType.POISON
-					&& elementalMeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (elementalMeta.getBasePotionData().getType() == PotionType.POISON && elementalMeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_healthboost":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_healthboost");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta healthmeta = (PotionMeta) ingredient.getItemMeta();
-			if (healthmeta.getBasePotionData().getType() == PotionType.INSTANT_HEAL
-					&& healthmeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (healthmeta.getBasePotionData().getType() == PotionType.INSTANT_HEAL && healthmeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_heavenslightness":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_heavenslightness");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta heavensmeta = (PotionMeta) ingredient.getItemMeta();
-			if (heavensmeta.getBasePotionData().getType() == PotionType.SLOW_FALLING
-					&& heavensmeta.getBasePotionData().isExtended())
-				;
-			else
-				canCraft = false;
+			if (heavensmeta.getBasePotionData().getType() == PotionType.SLOW_FALLING && heavensmeta.getBasePotionData().isExtended());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_icy":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_icy");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta icymeta = (PotionMeta) ingredient.getItemMeta();
-			if (icymeta.getBasePotionData().getType() == PotionType.SLOWNESS
-					&& icymeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (icymeta.getBasePotionData().getType() == PotionType.SLOWNESS && icymeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_leaping":
+			boolean[] configResultle = CheckConfigForRecipes(ingredient, "ee_recipe_leaping");
+			canCraft = configResultle[1];
+			if(!configResultle[0]) break;
+			
 			PotionMeta leapingmeta = (PotionMeta) ingredient.getItemMeta();
-			if (leapingmeta.getBasePotionData().getType() == PotionType.JUMP
-					&& leapingmeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (leapingmeta.getBasePotionData().getType() == PotionType.JUMP && leapingmeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_lifesteal":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_lifesteal");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta lifemeta = (PotionMeta) ingredient.getItemMeta();
-			if (lifemeta.getBasePotionData().getType() == PotionType.INSTANT_HEAL
-					&& lifemeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (lifemeta.getBasePotionData().getType() == PotionType.INSTANT_HEAL && lifemeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_stonefists":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_stonefists");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta stonemeta = (PotionMeta) ingredient.getItemMeta();
-			if (stonemeta.getBasePotionData().getType() == PotionType.STRENGTH
-					&& stonemeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (stonemeta.getBasePotionData().getType() == PotionType.STRENGTH && stonemeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_thermalplating":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_thermalplating");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta thermalmeta = (PotionMeta) ingredient.getItemMeta();
-			if (thermalmeta.getBasePotionData().getType() == PotionType.FIRE_RESISTANCE
-					&& thermalmeta.getBasePotionData().isExtended())
-				;
-			else
-				canCraft = false;
+			if (thermalmeta.getBasePotionData().getType() == PotionType.FIRE_RESISTANCE && thermalmeta.getBasePotionData().isExtended());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_traveler":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_traveler");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			PotionMeta travelermeta = (PotionMeta) ingredient.getItemMeta();
-			if (travelermeta.getBasePotionData().getType() == PotionType.SPEED
-					&& travelermeta.getBasePotionData().isUpgraded())
-				;
-			else
-				canCraft = false;
+			if (travelermeta.getBasePotionData().getType() == PotionType.SPEED && travelermeta.getBasePotionData().isUpgraded());
+			else canCraft = false;
 			break;
 		case "minecraft:ee_recipe_unbreakable":
+			configResult = CheckConfigForRecipes(ingredient, "ee_recipe_unbreakable");
+			canCraft = configResult[1];
+			if(!configResult[0]) break;
+			
 			EnchantmentStorageMeta meta = (EnchantmentStorageMeta) ingredient.getItemMeta();
-
-			if (meta.hasStoredEnchant(Enchantment.DURABILITY))
-			{
-				if (meta.getStoredEnchantLevel(Enchantment.DURABILITY) == 10)
-					;
-				else
-					canCraft = false;
-			} else
-				canCraft = false;
+			if (meta.hasStoredEnchant(Enchantment.DURABILITY)) if (meta.getStoredEnchantLevel(Enchantment.DURABILITY) != 10)	canCraft = false;
+			else canCraft = false;
 			break;
+		
+		default:
+			String str = recipe.replace("minecraft:", "");
+			configResult = CheckConfigForRecipes(ingredient, str);
+			canCraft = configResult[1];
+			
 		}
 		return canCraft;
 	}
-
+	
+	public boolean[] CheckConfigForRecipes(ItemStack ingredient, String name) {
+		boolean[] returns = new boolean[] {
+				true, true
+		};
+		
+		FileConfiguration recipeData = new YamlConfiguration();
+		try { recipeData.load("plugins/ExpandedEnchants/recipes.yml"); }
+		catch (InvalidConfigurationException e) { e.printStackTrace(); recipeData = null;}
+		catch(IOException e) {recipeData = null;};
+		if(recipeData != null) { 
+			if(recipeData.getConfigurationSection("ee_recipe_owleyes") != null) {
+				if(recipeData.isConfigurationSection("ee_recipe_owleyes")) {
+					if(recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").contains("Enchantment")) {
+						NamespacedKey enchName = NamespacedKey.fromString(recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getString("Enchantment"));
+						Enchantment ench = Enchantment.getByKey(enchName);
+						if(functions.IsCustomEnchant(ench)) {
+							ItemMeta meta = ingredient.getItemMeta();
+							if(meta.hasEnchant(ench)) if(meta.getEnchantLevel(ench) != recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getInt("Level")) returns[1] = false;
+						}
+						else {
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) ingredient.getItemMeta();
+							if (meta.hasStoredEnchant(ench)) if (meta.getStoredEnchantLevel(ench) != recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getInt("Level")) returns[1] = false;
+							else returns[1] = false;
+						}
+						returns[0] = false;
+					}
+					else if(recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").contains("Potion")) {
+						String potionName = recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getString("Potion");
+						PotionType potion = PotionType.valueOf(potionName);
+						PotionMeta meta = (PotionMeta) ingredient.getItemMeta();
+						if(meta.getBasePotionData().getType() != potion) returns[1] = false;
+						if(meta.getBasePotionData().isExtended() != recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getBoolean("Extended")) returns[1] = false;
+						if(meta.getBasePotionData().isUpgraded() != recipeData.getConfigurationSection("ee_recipe_owleyes.Advanced").getBoolean("Upgraded")) returns[1] = false;
+						
+						returns[0] = false;
+						
+					}
+				}
+				
+			}
+		}
+		return returns;
+	}
+	
 	HashMap<UUID, ArrayList<ItemStack>> itemsToPreserve = new HashMap<>();
 
 	public void HandleSoulboundEnchant(PlayerDeathEvent e)
@@ -985,6 +1221,7 @@ public class EventsClass implements Listener
 		}
 		itemsToPreserve.remove(player.getUniqueId());
 	}
+
 
 	ArrayList<UUID> noFallDamage = new ArrayList<>();
 
@@ -1094,7 +1331,9 @@ public class EventsClass implements Listener
 			{
 				continue;
 			}
-			int leftOverAmount = ingredients[i].getAmount() - customRecipe.amounts[i];
+			int amount = 0;
+			for(ItemStack item : customRecipe.items) if(item != null) if(item.getType().equals(ingredients[i].getType())) amount = item.getAmount(); 
+			int leftOverAmount = ingredients[i].getAmount() - amount;
 			if (leftOverAmount == 0)
 				leftOvers[i] = null;
 			else
@@ -1110,6 +1349,9 @@ public class EventsClass implements Listener
 		CountdownDisarmEnchant();
 		CountdownDisruptEnchant();
 		HandleAssassinCountdowns();
+		CountdownShulker();
+		CountdownThrust();
+		CountdownIcy();
 		
 		if (Bukkit.getOnlinePlayers().size() == 0)
 			return;
@@ -1120,13 +1362,6 @@ public class EventsClass implements Listener
 			HandleHeavensLightnessEnchant(player);
 			HandleThermalPlatingEnchant(player);
 			HandleLeapingEnchant(player);
-			if (canFreeze.containsKey(player.getUniqueId()))
-			{
-				double value = canFreeze.get(player.getUniqueId());
-				if (value == 0)
-					return;
-				canFreeze.put(player.getUniqueId(), value - 1);
-			}
 		}
 		
 	}
@@ -1141,6 +1376,15 @@ public class EventsClass implements Listener
 			else
 				oldValue = 0;
 
+		}
+	}
+	
+	public void CountdownIcy() {
+		for (UUID player : canFreeze.keySet())
+		{
+			double value = canFreeze.get(player);
+			if (value > 0) canFreeze.put(player, value - 1);
+			else value = 0;
 		}
 	}
 
@@ -1199,8 +1443,8 @@ public class EventsClass implements Listener
 			{
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
 				TextComponent component = new TextComponent(
-						"Deflect has a cooldown left of " + deflectCountdown.get(player.getUniqueId()) + " seconds!");
-				component.setColor(ChatColor.RED);
+					ChatColor.RED +	"Deflect has a cooldown left of " + ChatColor.WHITE + deflectCountdown.get(player.getUniqueId()) + ChatColor.RED + " seconds!");
+				//component.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
 			}
@@ -1387,6 +1631,7 @@ public class EventsClass implements Listener
 	ArrayList<Block> checkedBlocks = new ArrayList<Block>();
 	ArrayList<Block> veinMinedBlocks = new ArrayList<Block>();
 
+	@SuppressWarnings("unchecked")
 	public void HandleLumberjackEnchant(BlockBreakEvent e)
 	{
 		if (veinMinedBlocks.contains(e.getBlock()))
@@ -1405,9 +1650,11 @@ public class EventsClass implements Listener
 			return;
 		if (player.getGameMode() == GameMode.SPECTATOR)
 			return;
-		int maxMineSize = 128;
+		int maxMineSize = 512;
 		checkedBlocks.clear();
-		CheckSurroundingBlocks(originBlock, maxMineSize * 100 / 185);
+		newBlocks.clear();
+		newBlocks.add(originBlock);
+		CheckSurroundingBlocks((ArrayList<Block>)newBlocks.clone(), maxMineSize);
 		switch (Main.getPlugin().getConfig().getString("LumberjackMode"))
 		{
 		case "SNEAKING":
@@ -1430,7 +1677,15 @@ public class EventsClass implements Listener
 			else
 				itemMeta.setDamage(itemMeta.getDamage() + checkedBlocks.size());
 		}
-		player.setFoodLevel(player.getFoodLevel() - (5 - itemMeta.getEnchantLevel(CustomEnchantsManager.LUMBERJACK)));
+		float foodAmount = 5 - itemMeta.getEnchantLevel(CustomEnchantsManager.LUMBERJACK);
+		if(player.getSaturation() > 0) {
+			if(player.getSaturation() > foodAmount) player.setSaturation(player.getSaturation() - foodAmount);
+			else {
+				foodAmount = foodAmount - player.getSaturation();
+				player.setSaturation(0);
+			}
+		}
+		if(player.getFoodLevel() > 0) player.setFoodLevel((int) (player.getFoodLevel() - foodAmount));
 		for (Block block : checkedBlocks)
 		{
 			if (block != null)
@@ -1446,6 +1701,7 @@ public class EventsClass implements Listener
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void HandleVeinmineEnchant(BlockBreakEvent e)
 	{
 		if (veinMinedBlocks.contains(e.getBlock()))
@@ -1464,9 +1720,11 @@ public class EventsClass implements Listener
 			return;
 		if (player.getGameMode() == GameMode.SPECTATOR)
 			return;
-		int maxMineSize = 128;
+		int maxMineSize = 512;
 		checkedBlocks.clear();
-		CheckSurroundingBlocks(originBlock, maxMineSize * 100 / 185);
+		newBlocks.clear();
+		newBlocks.add(originBlock);
+		CheckSurroundingBlocks((ArrayList<Block>)newBlocks.clone(), maxMineSize);
 		switch (Main.getPlugin().getConfig().getString("VeinmineMode"))
 		{
 		case "SNEAKING":
@@ -1484,12 +1742,23 @@ public class EventsClass implements Listener
 		if (!itemMeta.isUnbreakable())
 		{
 			if (itemMeta.hasEnchant(Enchantment.DURABILITY))
-				itemMeta.setDamage(itemMeta.getDamage()
-						+ (checkedBlocks.size() / itemMeta.getEnchantLevel(Enchantment.DURABILITY) + 1));
+				itemMeta.setDamage(itemMeta.getDamage() + (checkedBlocks.size() / itemMeta.getEnchantLevel(Enchantment.DURABILITY) + 1));
 			else
 				itemMeta.setDamage(itemMeta.getDamage() + checkedBlocks.size());
 		}
-		player.setFoodLevel(player.getFoodLevel() - (5 - itemMeta.getEnchantLevel(CustomEnchantsManager.VEINMINE)));
+		float foodAmount = 5 - itemMeta.getEnchantLevel(CustomEnchantsManager.VEINMINE);
+		if(player.getSaturation() > 0) {
+			
+			if(player.getSaturation() > foodAmount) {
+				player.setSaturation(player.getSaturation() - foodAmount);
+				foodAmount = 0;
+			}
+			else {
+				foodAmount = foodAmount - player.getSaturation();
+				player.setSaturation(0);
+			}
+		}
+		if(player.getFoodLevel() > 0) player.setFoodLevel((int) (player.getFoodLevel() - foodAmount));
 		for (Block block : checkedBlocks)
 		{
 			if (block != null)
@@ -1504,77 +1773,78 @@ public class EventsClass implements Listener
 		veinMinedBlocks.clear();
 	}
 
-	public void CheckSurroundingBlocks(Block block, int maxSize)
+	ArrayList<Block> newBlocks = new ArrayList<>();
+	@SuppressWarnings("unchecked")
+	public void CheckSurroundingBlocks(ArrayList<Block> blocks, int maxSize)
 	{
-		Location blockLoc = block.getLocation();
-		if (checkedBlocks.size() == maxSize)
+		if (checkedBlocks.size() >= maxSize)
 			return;
-		Location under = new Location(blockLoc.getWorld(), blockLoc.getX(), blockLoc.getY() - 1, blockLoc.getZ());
-		Block underBlock = under.getBlock();
-		if (underBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(underBlock))
-			{
-				checkedBlocks.add(underBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(underBlock, maxSize);
-				else
-					return;
+		
+		for(Block block : blocks) {
+			newBlocks.remove(block);
+			if (block.getRelative(BlockFace.DOWN).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.DOWN)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.DOWN));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.DOWN));
+					else
+						return;
+				}
 			}
-		Location up = new Location(blockLoc.getWorld(), blockLoc.getX(), blockLoc.getY() + 1, blockLoc.getZ());
-		Block upBlock = up.getBlock();
-		if (upBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(upBlock))
-			{
-				checkedBlocks.add(upBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(upBlock, maxSize);
-				else
-					return;
+			if (block.getRelative(BlockFace.UP).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.UP)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.UP));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.UP));
+					else
+						return;
+				}
 			}
-		Location north = new Location(blockLoc.getWorld(), blockLoc.getX(), blockLoc.getY(), blockLoc.getZ() - 1);
-		Block northBlock = north.getBlock();
-		if (northBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(northBlock))
-			{
-				checkedBlocks.add(northBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(northBlock, maxSize);
-				else
-					return;
+			if (block.getRelative(BlockFace.NORTH).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.NORTH)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.NORTH));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.NORTH));
+					else
+						return;
+				}
 			}
-		Location south = new Location(blockLoc.getWorld(), blockLoc.getX(), blockLoc.getY(), blockLoc.getZ() + 1);
-		Block southBlock = south.getBlock();
-		if (southBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(southBlock))
-			{
-				checkedBlocks.add(southBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(southBlock, maxSize);
-				else
-					return;
+			if (block.getRelative(BlockFace.SOUTH).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.SOUTH)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.SOUTH));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.SOUTH));
+					else
+						return;
+				}
 			}
-		Location east = new Location(blockLoc.getWorld(), blockLoc.getX() + 1, blockLoc.getY(), blockLoc.getZ());
-		Block eastBlock = east.getBlock();
-		if (eastBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(eastBlock))
-			{
-				checkedBlocks.add(eastBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(eastBlock, maxSize);
-				else
-					return;
+			if (block.getRelative(BlockFace.WEST).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.WEST)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.WEST));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.WEST));
+					else
+						return;
+				}
 			}
-		Location west = new Location(blockLoc.getWorld(), blockLoc.getX() - 1, blockLoc.getY(), blockLoc.getZ());
-		Block westBlock = west.getBlock();
-		if (westBlock.getType().equals(block.getType()))
-			if (!checkedBlocks.contains(westBlock))
-			{
-				checkedBlocks.add(westBlock);
-				if (checkedBlocks.size() < maxSize)
-					CheckSurroundingBlocks(westBlock, maxSize);
-				else
-					return;
+			if (block.getRelative(BlockFace.EAST).getType().equals(block.getType())) {
+				if (!checkedBlocks.contains(block.getRelative(BlockFace.EAST)))
+				{
+					checkedBlocks.add(block.getRelative(BlockFace.EAST));
+					if (checkedBlocks.size() < maxSize)
+						newBlocks.add(block.getRelative(BlockFace.EAST));
+					else
+						return;
+				}
 			}
+		}
+		if(newBlocks.size() == 0) return;
+		if(checkedBlocks.size() < maxSize) CheckSurroundingBlocks((ArrayList<Block>) newBlocks.clone(), maxSize);
 	}
 
 	public void HandleWideEnchant(BlockBreakEvent e)
@@ -1752,7 +2022,9 @@ public class EventsClass implements Listener
 
 	public BlockFace GetBlockFace(Player player)
 	{
-		List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);
+		Set<Material> transparent = new HashSet<>();
+		transparent.add(Material.WATER); transparent.add(Material.LAVA); transparent.add(Material.AIR);
+		List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(transparent, 100);
 		if (lastTwoTargetBlocks.size() != 2 /*|| !lastTwoTargetBlocks.get(1).getType().isOccluding()*/) {
 			return null;
 		}
@@ -2244,17 +2516,34 @@ public class EventsClass implements Listener
 			return;
 		if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
 			return;
-		if (player.getInventory().firstEmpty() == -1)
-			return;
+		if (player.getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.AUTOSMELT)) return;
 
 		List<ItemStack> drops = e.getDrops();
-		if (drops.size() == 0)
+		if (drops.isEmpty())
 			return;
-		for (ItemStack item : drops)
-		{
-			player.getInventory().addItem(item);
+		ItemStack[] items = new ItemStack[drops.size()];
+		for(int i = 0; i < drops.size(); i++) {
+			items[i] = drops.get(i);
+			//Main.Log("DropAmount: " + items[i].getAmount());
 		}
-		e.getDrops().clear();
+		HashMap<Integer, ItemStack>	notFit = player.getInventory().addItem(items);
+		if(!notFit.isEmpty()) {
+			for(int i = 0; i < drops.size(); i++) {
+				//Main.Log("Item: " + drops.get(i).getItemStack());
+				boolean remove = true;
+				//Main.Log("AmountBefore: " + event.getItems().get(i).getItemStack().getAmount());
+				for(Entry<Integer, ItemStack> entry : notFit.entrySet()) if(entry.getValue().getType().equals(e.getDrops().get(i).getType())) {
+					remove = false;
+					ItemStack editted = e.getDrops().get(i);
+					//Main.Log("EntryAmount: " + entry.getValue().getAmount());
+					editted.setAmount(entry.getValue().getAmount());
+					e.getDrops().set(i, editted);
+				}
+				if(remove) e.getDrops().remove(i);
+				//Main.Log("AmountAfter: " + event.getItems().get(i).getItemStack().getAmount());
+			}
+		}
+		else e.getDrops().clear();
 	}
 
 	public void HandleDirectBlockEnchant(BlockDropItemEvent event)
@@ -2267,19 +2556,37 @@ public class EventsClass implements Listener
 			return;
 		if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getPlayer().getGameMode() == GameMode.SPECTATOR)
 			return;
-		if (event.getPlayer().getInventory().firstEmpty() == -1)
-			return;
-		if (event.getBlock().getState() instanceof Container)
-			return;
-
-		if (!event.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.AUTOSMELT)) event.setCancelled(true);
-		else return;
+			
+		if (event.getPlayer().getInventory().getItemInMainHand().getItemMeta().hasEnchant(CustomEnchantsManager.AUTOSMELT)) return;
 		Player player = event.getPlayer();
 
 		List<Item> drops = event.getItems();
 		if (drops.isEmpty())
 			return;
-		player.getInventory().addItem(drops.iterator().next().getItemStack());
+		ItemStack[] items = new ItemStack[drops.size()];
+		for(int i = 0; i < drops.size(); i++) {
+			items[i] = drops.get(i).getItemStack(); 
+			//Main.Log("DropAmount: " + items[i].getAmount());
+		}
+		HashMap<Integer, ItemStack>	notFit = player.getInventory().addItem(items);
+		if(!notFit.isEmpty()) {
+			for(int i = 0; i < drops.size(); i++) {
+				//Main.Log("Item: " + drops.get(i).getItemStack());
+				boolean remove = true;
+				//Main.Log("AmountBefore: " + event.getItems().get(i).getItemStack().getAmount());
+				for(Entry<Integer, ItemStack> entry : notFit.entrySet()) if(entry.getValue().getType().equals(event.getItems().get(i).getItemStack().getType())) {
+					remove = false;
+					ItemStack editted = event.getItems().get(i).getItemStack();
+					//Main.Log("EntryAmount: " + entry.getValue().getAmount());
+					editted.setAmount(entry.getValue().getAmount());
+					event.getItems().get(i).setItemStack(editted);
+				}
+				if(remove) event.getItems().remove(i);
+				//Main.Log("AmountAfter: " + event.getItems().get(i).getItemStack().getAmount());
+			}
+		}
+		else event.setCancelled(true);
+		
 	}
 
 	public void HandleAutoSmeltEnchant(BlockDropItemEvent e)
@@ -2521,8 +2828,10 @@ public class EventsClass implements Listener
 			{
 				if (item.equals(item2))
 					continue;
-				if (item.conflictsWith(item2))
+				if (item.conflictsWith(item2) || item2.conflictsWith(item)) {
+					e.setResult(null);
 					return;
+				}
 			}
 			if (!item.canEnchantItem(fs)) {
 				e.setResult(null);
@@ -2827,6 +3136,10 @@ public class EventsClass implements Listener
 		if (fs.getItemMeta().hasConflictingEnchant(ench))
 			return;
 
+		for(Enchantment enc : fs.getItemMeta().getEnchants().keySet()) {
+			if(enc.conflictsWith(ench) || ench.conflictsWith(enc)) return;
+		}
+		
 		ItemStack resultItem = new ItemStack(fs);
 		resultItem.addUnsafeEnchantment(ench, ss.getItemMeta().getEnchantLevel(ench));
 		ItemMeta meta = resultItem.getItemMeta();
@@ -3307,34 +3620,34 @@ public class EventsClass implements Listener
 						AnvilInventory ainv = (AnvilInventory) inv;
 						if (rawSlot == 2)
 						{
-							Bukkit.getServer().getConsoleSender().sendMessage("3");
+							Main.Log("3");
 							if(!isModified.containsKey(ent.getUniqueId())) return;
 							if (!isModified.get(ent.getUniqueId())) return;
-							Bukkit.getServer().getConsoleSender().sendMessage("2");
+							Main.Log("2");
 							ItemStack item = e.getCurrentItem();
 							if (item != null)
 							{
-								Bukkit.getServer().getConsoleSender().sendMessage("4");
+								Main.Log("4");
 								ItemMeta meta = item.getItemMeta();
 								if (meta != null)
 								{
-									Bukkit.getServer().getConsoleSender().sendMessage("6");
+									Main.Log("6");
 
 									if (ainv.getRepairCost() > player.getLevel())
 										return;
-									Bukkit.getServer().getConsoleSender().sendMessage("7");
+									Main.Log("7");
 									player.setItemOnCursor(item);
 									player.setLevel(player.getLevel() - ainv.getRepairCost());
 									ItemStack cost = new ItemStack(inv.getContents()[1]);
-									Bukkit.getServer().getConsoleSender().sendMessage("1");
+									Main.Log("1");
 									Enchantment ench = Main.recipeManager.GetEnchantment(cost.getType());
 									if (ench != null)
 									{
 										int amount = Main.recipeManager.GetAmount(ench);
 										int tot = cost.getAmount();
 										int left = tot - amount;
-										Bukkit.getServer().getConsoleSender().sendMessage("Amount: " + amount);
-										Bukkit.getServer().getConsoleSender().sendMessage("Left: " + left);
+										Main.Log("Amount: " + amount);
+										Main.Log("Left: " + left);
 										cost.setAmount(left);
 
 										ItemStack[] content = new ItemStack[] { null, cost, null };
