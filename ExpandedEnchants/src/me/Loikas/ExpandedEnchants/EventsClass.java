@@ -101,6 +101,7 @@ import org.bukkit.util.Vector;
 import me.Loikas.ExpandedEnchants.Util.AssassinInfo;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
 import me.Loikas.ExpandedEnchants.Util.Functions;
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -481,7 +482,7 @@ public class EventsClass implements Listener
 		if(thrustCooldown.containsKey(e.getPlayer().getUniqueId())) {
 			if(thrustCooldown.get(e.getPlayer().getUniqueId()) > 0) {
 				e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR);
-				TextComponent component = new TextComponent(ChatColor.DARK_RED + "Thrusters has a cooldown of " + ChatColor.WHITE + thrustCooldown.get(e.getPlayer().getUniqueId()) + ChatColor.DARK_RED +" seconds left!");
+				TextComponent component = new TextComponent(ChatColor.DARK_RED + LanguageManager.instance.GetTranslatedValue("thrusters-cooldown").replace("{seconds}", ChatColor.WHITE + "" + thrustCooldown.get(e.getPlayer().getUniqueId())));
 				//component.setColor(ChatColor.DARK_RED);
 				e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
@@ -566,7 +567,7 @@ public class EventsClass implements Listener
 			for(AssassinInfo i : assassinInfo) if(i.getPlayer().equals(player.getUniqueId())) containsPlayer = i;
 			if(containsPlayer == null) {
 					if(e.isSneaking()) {
-						BossBar bossBar = Bukkit.createBossBar("Hidden for "+ countdown + " seconds", BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY);
+						BossBar bossBar = Bukkit.createBossBar(LanguageManager.instance.GetTranslatedValue("assassin-hidden-for").replace("{seconds}", "" + countdown), BarColor.GREEN, BarStyle.SOLID, BarFlag.DARKEN_SKY);
 						bossBar.addPlayer(e.getPlayer());
 						int refill = 48 - (2 * level);
 						AssassinInfo info = new AssassinInfo(player.getUniqueId(), countdown, refill, bossBar);
@@ -625,7 +626,7 @@ public class EventsClass implements Listener
 		info.setShouldCountdown(false);
 		info.setRefill(info.getRefillMax());
 		info.bar.setColor(BarColor.YELLOW);
-		info.bar.setTitle("Recharging ability for " + Math.round(info.getRefillMax()) + " seconds");
+		info.bar.setTitle(LanguageManager.instance.GetTranslatedValue("assassin-recharging").replace("{seconds}", "" + Math.round(info.getRefillMax())));
 		info.setShouldRefill(true);
 		for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), Bukkit.getPlayer(info.getPlayer()));
 		
@@ -641,13 +642,13 @@ public class EventsClass implements Listener
 						info.setShouldCountdown(false);
 						info.setRefill(info.getRefillMax());
 						info.bar.setColor(BarColor.YELLOW);
-						info.bar.setTitle("Recharging ability for " + Math.round(info.getRefillMax()) + " seconds");
+						info.bar.setTitle(LanguageManager.instance.GetTranslatedValue("assassin-recharging").replace("{seconds}", "" + Math.round(info.getRefillMax())));
 						info.setShouldRefill(true);
 						for(Player p : Bukkit.getOnlinePlayers()) p.showPlayer(Main.getPlugin(), Bukkit.getPlayer(info.getPlayer()));
 					}
 					else {
 						info.bar.setProgress(info.getCountdown() / info.getCountdownMax());
-						info.bar.setTitle("Hidden for "+ Math.round(info.getCountdown()) + " seconds");
+						info.bar.setTitle(LanguageManager.instance.GetTranslatedValue("assassin-hidden-for").replace("{seconds}", "" + Math.round(info.getCountdown())));
 					}
 				}
 			}
@@ -658,11 +659,11 @@ public class EventsClass implements Listener
 					info.setShouldRefill(false);
 					info.setCountdown(info.getCountdownMax());
 					info.bar.setColor(BarColor.GREEN);
-					info.bar.setTitle("Hidden for " + Math.round(info.getCountdownMax()) + " seconds");
+					info.bar.setTitle(LanguageManager.instance.GetTranslatedValue("assassin-hidden-for").replace("{seconds}", "" + Math.round(info.getCountdownMax())));
 				}
 				else {
 					info.bar.setProgress(1 - (info.getRefill() / info.getRefillMax()));
-					info.bar.setTitle("Recharging ability for " + Math.round(info.getRefill()) + " seconds");
+					info.bar.setTitle(LanguageManager.instance.GetTranslatedValue("assassin-recharging").replace("{seconds}", "" + Math.round(info.getRefill())));
 				}
 			}
 		}
@@ -828,42 +829,33 @@ public class EventsClass implements Listener
 				replantingBlock = ageData;
 				e.getPlayer().breakBlock(e.getClickedBlock());
 				loc.getBlock().setType(Material.WHEAT);
-				Damageable dam = (Damageable) e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-				dam.setDamage(dam.getDamage() + 1);
-				e.getItem().setItemMeta(dam);
 			}
 			if (data.getMaterial() == Material.CARROTS)
 			{
 				replantingBlock = ageData;
 				e.getPlayer().breakBlock(e.getClickedBlock());
 				loc.getBlock().setType(Material.CARROTS);
-				Damageable dam = (Damageable) e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-				dam.setDamage(dam.getDamage() + 1);
-				e.getItem().setItemMeta(dam);
 			}
 			if (data.getMaterial() == Material.POTATOES)
 			{
 				replantingBlock = ageData;
 				e.getPlayer().breakBlock(e.getClickedBlock());
 				loc.getBlock().setType(Material.POTATOES);
-				Damageable dam = (Damageable) e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-				dam.setDamage(dam.getDamage() + 1);
-				e.getItem().setItemMeta(dam);
 			}
 			if (data.getMaterial() == Material.BEETROOTS)
 			{
 				replantingBlock = ageData;
 				e.getPlayer().breakBlock(e.getClickedBlock());
 				loc.getBlock().setType(Material.BEETROOTS);
-				Damageable dam = (Damageable) e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
-				dam.setDamage(dam.getDamage() + 1);
-				e.getItem().setItemMeta(dam);
+				
 			}
 			if (data.getMaterial() == Material.NETHER_WART)
 			{
 				replantingBlock = ageData;
 				e.getPlayer().breakBlock(e.getClickedBlock());
 				loc.getBlock().setType(Material.NETHER_WART);
+			}
+			if(!e.getItem().getItemMeta().hasEnchant(CustomEnchantsManager.NOBREAKABLE)) { 
 				Damageable dam = (Damageable) e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
 				dam.setDamage(dam.getDamage() + 1);
 				e.getItem().setItemMeta(dam);
@@ -1133,7 +1125,7 @@ public class EventsClass implements Listener
 			if(!configResult[0]) break;
 			
 			EnchantmentStorageMeta meta = (EnchantmentStorageMeta) ingredient.getItemMeta();
-			if (meta.hasStoredEnchant(Enchantment.DURABILITY)) if (meta.getStoredEnchantLevel(Enchantment.DURABILITY) != 10)	canCraft = false;
+			if (meta.hasStoredEnchant(Enchantment.DURABILITY)) {if (meta.getStoredEnchantLevel(Enchantment.DURABILITY) != 10)	canCraft = false; }
 			else canCraft = false;
 			break;
 		
@@ -1407,7 +1399,7 @@ public class EventsClass implements Listener
 			if (!player.getInventory().contains(Material.EMERALD))
 			{
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
-				TextComponent component = new TextComponent("No emeralds to deflect damage!");
+				TextComponent component = new TextComponent(LanguageManager.instance.GetTranslatedValue("deflect-no-emeralds"));
 				component.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
@@ -1416,7 +1408,7 @@ public class EventsClass implements Listener
 					Main.getPlugin().getConfig().getInt("DeflectCost")))
 			{
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
-				TextComponent component = new TextComponent("Not enough emeralds to deflect damage!");
+				TextComponent component = new TextComponent(LanguageManager.instance.GetTranslatedValue("deflect-not-enough"));
 				component.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;
@@ -1425,7 +1417,7 @@ public class EventsClass implements Listener
 			{
 				e.setCancelled(true);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
-				TextComponent component = new TextComponent("Damage deflected!");
+				TextComponent component = new TextComponent(LanguageManager.instance.GetTranslatedValue("deflect-damage-deflected"));
 				component.setColor(ChatColor.GREEN);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				player.getInventory().removeItem(
@@ -1434,7 +1426,7 @@ public class EventsClass implements Listener
 			{
 				e.setCancelled(true);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
-				TextComponent component = new TextComponent("Damage deflected!");
+				TextComponent component = new TextComponent(LanguageManager.instance.GetTranslatedValue("deflect-damage-deflected"));
 				component.setColor(ChatColor.GREEN);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				player.getInventory().removeItem(
@@ -1443,7 +1435,7 @@ public class EventsClass implements Listener
 			{
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR);
 				TextComponent component = new TextComponent(
-					ChatColor.RED +	"Deflect has a cooldown left of " + ChatColor.WHITE + deflectCountdown.get(player.getUniqueId()) + ChatColor.RED + " seconds!");
+					ChatColor.RED +	LanguageManager.instance.GetTranslatedValue("deflect-cooldown").replace("{seconds}", ChatColor.WHITE + "" + deflectCountdown.get(player.getUniqueId())));
 				//component.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 				return;

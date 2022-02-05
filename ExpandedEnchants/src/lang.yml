@@ -1,0 +1,207 @@
+no-specified-enchant-buy: You haven't specified which enchant you want to buy!
+no-permission-buy-enchant: You don't have permission to buy this enchant!
+not-holding-item: You are not holding an item!
+not-holding-valid-item: You are not holding a valid item!
+buying-not-enabled: Buying enchants is not enabled on this server. Contact your server administrator for more information!
+enchant-not-found: This enchant has not been specified. Are you sure you typed it correctly and that you can enchant it on this item?
+not-compatible-with: This enchant is can't be bought when you have {ench}!
+cant-afford: You can't afford this! The price is {price}
+bought-succes: Succesfully bought {enchantName} for {price}
+buy-failed: Buying the enchantment failed! It had a {chance}% chance of succes! 
+max-level: This enchant is already at the max level on your current item!
+cost-buy-message: Buying {ench} {level} would cost {price} and has a succes chance of {chance}%
+no-permission: You don't have permission for this command!
+contains-higher-level: Item contains a higher level enchantment!
+already-contains: Item already contains this enchantment!
+already-max-level: Enchantment is already max level on this item!
+enchanted-with: Enchanted item with [{enchant}] 
+cant-apply: Can't apply enchant to this item!
+contains-conflict: Item contains conflicting enchantment!
+
+thrusters-cooldown: Thrusters has a cooldown of {seconds} seconds left!
+
+deflect-no-emeralds: No emeralds to deflect damage!
+deflect-not-enough: Not enough emeralds to deflect damage!
+deflect-damage-deflected: Damage deflected!
+deflect-cooldown: Deflect has a cooldown left of {seconds} seconds!
+
+assassin-hidden-for: Hidden for {seconds} seconds
+assassin-recharging: Recharging ability for {seconds} seconds
+
+bows: Bows
+helmets: Helmets
+chestplates: Chestplates
+leggings: Leggings
+boots: Boots
+pickaxes: Pickaxes
+elytras: "Elytra's"
+axes: Axes
+fishingrods: Fishing rods
+swords: Swords
+hoes: "hoe's"
+shears: Shears
+shovels: Shovels
+tridents: Tridents
+crossbows: Crossbows
+all-enchantable-items: All enchantable items
+all-items-durability: All items iwth durability
+
+nothing: Nothing
+
+empty-book-inventory-title: Empty Enchantment Book
+inventory-back: Back
+inventory-description: Description
+inventory-can-enchant: Can enchant
+inventory-conflicts: Conflicts with
+inventory-max-level: "Max Level:"
+inventory-title-recipes: Crafting Recipes
+inventory-title-vanilla: Vanilla enchantment recipes
+inventory-title-custom: Custom enchantment recipes
+inventory-title-choose: Choose an enchantment
+inventory-lore-empty-book: 
+    - The recipe for the enchantment book
+    - needed in all level 1 custom recipes.
+inventory-lore-empty-book-recipe-part1:
+    - You can find the recipe for this
+    - in the top right in the
+    - choose custom recipe menu!
+inventory-lore-empty-book-recipe-part2:
+    - This can also be a book enchanted
+    - with this enchant to
+    - create a higher level book.
+anvil-name: Anvil
+crafted-in-anvil: Has to be crafted in an anvil.
+book-tool-weapon: Book, Tool, Weapon or Enchanted Book
+book-tool-weapon-lore:
+    - Can be a book, weapon, tool
+    - for enchanted book depending
+    - on the enchantment.
+
+antigravity-desc:
+    - Make your arrows fly true.
+    - Arrows won't be affected by gravity anymore.
+assassin-desc:
+    - Silently approach your foes.
+    - If you equip this nobody
+    - will be able to see you.
+    - Cancel when you deal damage to something!
+    - Length increases and cooldown
+    - decreases per level.
+autosmelt-desc:
+    - Automatically smelt all ores 
+    - and logs you mine.
+    - Compatible with fortune and direct.
+beheading-desc:
+    - Higher chance to drop mob heads.
+    - Each level adds + 5% chance.
+deflect-desc:
+    - Deflect damage every 30 seconds.
+    - Takes an emerald every time.
+    - Each level lowers the cooldown by 1 second.
+direct-desc:
+    - Teleport broken blocks or killed mob items
+    - directly into your inventory.
+disarming-desc:
+    - Has a small chance to drop the enemy player's
+    - main hand weapon or one of their armor pieces.
+    - Cooldown of 30 seconds.
+disruption-desc:
+    - Deal more damage to mobs that can teleport
+    - and disable their ability to teleport.
+    - These mobs are endermen and shulkers.
+elementalprotection-desc: 
+    - Protects you against more damage sources
+    - which add up if you increase the level.
+    - "- Level 1: Poison"
+    - "- Level 2: Wither"
+    - "- Level 3: Void"
+eyesofowl-desc:
+    - No more potions of night vision
+    - see everything permanently.
+experienceboost-desc:
+    - Chance to double the xp you get
+    - each level increases the chance by 15%
+feedingmodule-desc:
+    - Automatically eats foods for you.
+    - Takes the left most food in your inventory.
+    - Compatible with gourmand.
+gourmand-desc:
+    - Food becomes more delicious and
+    - restores more food points when you eat it.
+    - Compatible with feeding module.
+healthboost-desc:
+    - Add one heart for each level.
+heavenslightness-desc:
+    - Permanent slow falling.
+    - Never have fall damage again.
+icy-desc:
+    - Give a slowness effect to every
+    - entity you hit. Cooldown is 10 seconds.
+    - Makes players unable to jump.
+    - Level increases the slowness level.
+lavawalker-desc:
+    - Places a block of basalt
+    - under you every time you walk
+    - over lava.
+leaping-desc:
+    - Always have a jump boost effect.
+lifesteal-desc:
+    - Steal some of the hearts your enemy had.
+    - Half a heart per level.
+lumberjack-desc:
+    - Break the whole tree when you break one block.
+    - Each level decreases the food cost.
+oresight-desc:
+    - Allows you to see ores through walls.
+    - Levels change the ores you see.
+    - "IE: Lvl 3 is only gold, nothing else."
+    - "Level:"
+    - "1: Coal"
+    - "2: Iron and Copper"
+    - "3: Gold"
+    - "4: Lapis and Redstone"
+    - "5: Diamond and Emerald"
+    - "6: Ancient debris"
+replanting-desc:
+    - Whenever you right click a full grown crop
+    - it automatically replants it.
+shadowstep-desc:
+    - Makes it harder for mobs to hear you.
+    - Decreases follow distance.
+soulbound-desc:
+    - Preserve your item on death.
+    - You will keep all items with soulbound
+    - after you die.
+splitting-desc:
+    - Shoots arrows to all nearby
+    - mobs when you hit a mob.
+stepping-desc:
+    - Makes it easier to walk up
+    - single blocks.
+stonefists-desc:
+    - Increase your attack damage significantly.
+thermalplating-desc:
+    - Get permanent fire resistance
+    - BUT ONLY IF EVERY ARMOR PIECE
+    - HAS THE ENCHANT.
+thrusters-desc:
+    - Shift to boost forward when
+    - gliding with your elytra.
+traveler-desc:
+    - Get a permanent speed boost.
+unbreakable-desc:
+    - Makes a tool truely unbreakable.
+veinmine-desc:
+    - When you mine one ores
+    - it mines all.
+    - Each level decreases the food cost.
+wide-desc:
+    - Mine 3x3 to make your life easier.
+    - Also works with right clicking on
+    - hoes, axes and shovels.
+
+
+
+
+
+

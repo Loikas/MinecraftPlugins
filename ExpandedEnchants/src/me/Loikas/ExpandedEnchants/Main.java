@@ -37,6 +37,7 @@ import me.Loikas.ExpandedEnchants.Inventories.InventoryManager;
 import me.Loikas.ExpandedEnchants.UpdateChecker.UpdateChecker;
 import me.Loikas.ExpandedEnchants.Util.AssassinInfo;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 import net.milkbowl.vault.economy.Economy;
 
 
@@ -72,13 +73,10 @@ public class Main extends JavaPlugin
 		
 		itemManager = new ItemManager();
 	
-			try
-			{
-				new YamlConfiguration().load("plugins/ExpandedEnchants/SaveData.yml");
-			} catch (IOException | InvalidConfigurationException e)
-			{
-				this.saveResource("SaveData.yml", false);
-			} 
+		try { new YamlConfiguration().load("plugins/ExpandedEnchants/SaveData.yml"); } catch  (IOException | InvalidConfigurationException e) { this.saveResource("SaveData.yml", false); }
+		try { new YamlConfiguration().load("plugins/ExpandedEnchants/lang.yml"); } catch  (IOException | InvalidConfigurationException e) { this.saveResource("lang.yml", false); }
+		
+		LanguageManager.instance = new LanguageManager();
 	
 		CustomEnchantsManager.custom_enchants = new ArrayList<>();
 		AddAllCustomEnchants();

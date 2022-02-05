@@ -147,14 +147,3 @@ WideActivationMode: SNEAKING
 #pathing dirt and stripping wood
 #choose between SNEAKING, STANDING or BOTH:
 WideSpecialActionMode: SNEAKING
-
-#This is only of use if you have vault enabled on your server and 
-#want players to be able to enchant items using money
-#Make sure the players have the 'ee.command.buy.{nameOfPackage}' 
-#More info about creating packages can be found here: https://github.com/Loikas/ExpandedEnchants/wiki/Adding-buyable-packages
-BuyCommandEnchants:
-    pvp:
-        Enchants:
-            - minecraft:sharpness:20
-            - minecraft:ee_healhboost:5
-        Price: 1000

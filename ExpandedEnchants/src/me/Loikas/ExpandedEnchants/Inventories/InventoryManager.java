@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 
 public class InventoryManager implements Listener
 {
@@ -33,32 +34,31 @@ public class InventoryManager implements Listener
 	
 	@SuppressWarnings("deprecation")
 	public InventoryManager() {
-		startInv = Bukkit.createInventory(null, 27, "§5§lCrafting Recipes");
+		startInv = Bukkit.createInventory(null, 27, "§5§l" + LanguageManager.instance.GetTranslatedValue("inventory-title-recipes"));
 		ItemStack vanillaItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
 		ItemStack customItem = new ItemStack(Material.ENCHANTED_BOOK, 1);
 		ItemMeta vanillaMeta = vanillaItem.getItemMeta();
 		ItemMeta customaMeta = customItem.getItemMeta();
-		vanillaMeta.setDisplayName("§b§lVanilla enchantment recipes");
-		customaMeta.setDisplayName("§b§lCustom enchantment recipes");
+		vanillaMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("inventory-title-vanilla"));
+		customaMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("inventory-title-custom"));
 		vanillaItem.setItemMeta(vanillaMeta);
 		customItem.setItemMeta(customaMeta);
 		startInv.setItem(12, vanillaItem);
 		startInv.setItem(14, customItem);
 		
-		vanillaChoose = Bukkit.createInventory(null, 54, "§5§lChoose an enchantment");
+		vanillaChoose = Bukkit.createInventory(null, 54, "§5§l" + LanguageManager.instance.GetTranslatedValue("inventory-title-choose"));
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) item.getItemMeta();
 		meta.setOwner("MHF_ArrowLeft");
-		meta.setDisplayName("§e§lBack");
+		meta.setDisplayName("§e§l" + LanguageManager.instance.GetTranslatedValue("inventory-back"));
 		item.setItemMeta(meta);
 		vanillaChoose.setItem(0, item);
-		customChoose = Bukkit.createInventory(null, 45, "§5§lChoose an enchantment");
+		customChoose = Bukkit.createInventory(null, 45, "§5§l" + LanguageManager.instance.GetTranslatedValue("inventory-title-choose"));
 		customChoose.setItem(0, item);
 		ItemStack enchBook = new ItemStack(Material.ENCHANTED_BOOK);
 		ItemMeta enchMeta = enchBook.getItemMeta();
 		List<String> lore = new ArrayList<>();
-		lore.add("§fThe recipe for the enchantment book");
-		lore.add("§fneeded in all level 1 custom recipes.");
+		for(String string : LanguageManager.instance.GetTranslatedList("inventory-lore-empty-book")) lore.add("§f" + string);
 		enchMeta.setLore(lore);
 		enchBook.setItemMeta(enchMeta);
 		customChoose.setItem(8, enchBook);

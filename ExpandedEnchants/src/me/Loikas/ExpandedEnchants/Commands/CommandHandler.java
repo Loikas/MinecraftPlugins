@@ -2,9 +2,7 @@ package me.Loikas.ExpandedEnchants.Commands;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.GameMode;
@@ -28,6 +26,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.Loikas.ExpandedEnchants.CustomEnchantsManager;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class CommandHandler implements CommandExecutor
@@ -111,33 +110,13 @@ public class CommandHandler implements CommandExecutor
 			
 			if(args[0].equalsIgnoreCase("buy")) {
 				if(Main.econ == null) { sender.sendMessage(ChatColor.RED + "Vault is not enabled on this server. Contact your server administrator for more information."); return true; }
-				int amount = 1;
-				if(args.length >= 3) {
-					try {
-						amount = Integer.parseInt(args[2]);
-					}
-					catch(NumberFormatException e) {
-						sender.sendMessage(ChatColor.RED + "Please fill in a valid amount!");
-						return true;
-					}
-				}
-				return BuyEnchants(player, args, false, amount);
+				return BuyEnchants(player, args, false);
 			}
 			
 			if(args[0].equalsIgnoreCase("cost")) {
 				if(Main.econ == null) { sender.sendMessage(ChatColor.RED + "Vault is not enabled on this server. Contact your server administrator for more information."); return true; }
 				if(args[1].equalsIgnoreCase("repair")) { BuyRepair(player, true); return true;}
-				int amount = 1;
-				if(args.length >= 3) {
-					try {
-						amount = Integer.parseInt(args[2]);
-					}
-					catch(NumberFormatException e) {
-						sender.sendMessage(ChatColor.RED + "Please fill in a valid amount!");
-						return true;
-					}
-				}
-				return BuyEnchants(player, args, true, amount);
+				return BuyEnchants(player, args, true);
 			}
 			
 			if(args[0].equalsIgnoreCase("enchant")) {
@@ -242,86 +221,95 @@ public class CommandHandler implements CommandExecutor
 	}
 	
 	@SuppressWarnings("deprecation")
-	public boolean BuyEnchants(Player sender, String[] args, boolean checkCost, int amount) {
-		if(args.length < 2) { sender.sendMessage(ChatColor.RED + "You haven't specified which package you want to buy!"); return true; }
-		if(!sender.hasPermission("ee.command.buy." + args[1])) { sender.sendMessage(ChatColor.RED + "You don't have permission for this package!"); return true; }
-		if(sender.getInventory().getItemInMainHand() == null) { sender.sendMessage(ChatColor.RED + "You are not holding an item!"); return true; }
-		if(sender.getInventory().getItemInMainHand().getItemMeta() == null) { sender.sendMessage(ChatColor.RED + "You are not holding a valid item!"); return true; }
+	public boolean BuyEnchants(Player sender, String[] args, boolean checkCost) {
+		if(args.length < 2) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("no-specified-enchant-buy")); return true; }
+		if(!sender.hasPermission("ee.command.buy." + args[1])) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("no-permission-buy-enchant")); return true; }
+		if(sender.getInventory().getItemInMainHand() == null) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("not-holding-item")); return true; }
+		if(sender.getInventory().getItemInMainHand().getItemMeta() == null) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("not-holding-valid-item")); return true; }
 		ItemStack item = sender.getInventory().getItemInMainHand();
-		List<String> enchantList = Main.getPlugin().getConfig().getStringList("BuyCommandEnchants." + args[1] + ".Enchants");
-		List<Enchantment> enchants = new ArrayList<>();
-		List<Integer> maxLevels = new ArrayList<>();
 		
-		if(enchantList.size() == 0) { sender.sendMessage(ChatColor.RED + "This package doesn't exist or doesn't contain any enchantments."); return true; }
-		for(String string : enchantList) enchants.add(Enchantment.getByKey(NamespacedKey.fromString(string.split(":")[0] + ":" + string.split(":")[1])));
-		for(String string : enchantList) maxLevels.add(Integer.parseInt(string.split(":")[2]));
-		HashMap<Enchantment, Integer> possibleEnchants = new HashMap<>();
-		for(int i = 0; i < enchants.size(); i++) {
-			if(enchants.get(i) == null) continue;
-			if(enchants.get(i).canEnchantItem(sender.getInventory().getItemInMainHand())) {
-				boolean noConflict = true;
-				for(Enchantment enchant : item.getItemMeta().getEnchants().keySet()) if(enchant.conflictsWith(enchants.get(i)) && !enchant.equals(enchants.get(i))) {
-					noConflict = false;
-				}
-				if(noConflict) {
-					
-					if(item.getItemMeta().hasEnchant(enchants.get(i))) { 
-						if(enchants.get(i) == Enchantment.LURE) maxLevels.set(i, 3);
-						if(enchants.get(i) == Enchantment.DEPTH_STRIDER) maxLevels.set(i, 3);
-						if(enchants.get(i) == Enchantment.QUICK_CHARGE) maxLevels.set(i, 5);
-						if(item.getItemMeta().getEnchantLevel(enchants.get(i)) < maxLevels.get(i)) {
-							possibleEnchants.put(enchants.get(i), maxLevels.get(i) - item.getItemMeta().getEnchantLevel(enchants.get(i))); 
-						}
-					}
-					else possibleEnchants.put(enchants.get(i), maxLevels.get(i));
-				}
+		FileConfiguration buy = new YamlConfiguration();
+		try { buy.load("plugins/ExpandedEnchants/buy.yml"); }
+		catch (InvalidConfigurationException e) { e.printStackTrace(); buy = null;}
+		catch(IOException e) {buy = null;};
+		if(buy == null) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("buying-not-enabled")); return true; } 
+		
+		String itemType = EventsClass.functions.GetItemTypeName(item);
+		List<String> levelList = buy.getStringList(itemType + "." + args[1] + ".levels");
+		if(levelList.isEmpty()) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("enchant-not-found")); return true; }
+		Enchantment ench = Enchantment.getByKey(NamespacedKey.fromString(args[1].trim()));
+		String enchName = EventsClass.functions.IsCustomEnchant(ench) ? ench.getName() : EventsClass.functions.GetEnchantmentName(ench);
+		
+		List<Integer> levels = new ArrayList<>();
+		List<Double> prices = new ArrayList<>();
+		List<Integer> succes = new ArrayList<>();
+		
+		Integer maxLevel = buy.getInt(itemType + "." + args[1] + ".max" , ench.getMaxLevel());
+		
+		for(String string : levelList) levels.add(Integer.parseInt(string.split(",")[0].trim()));
+		for(String string : levelList) prices.add(Double.parseDouble(string.split(",")[1].trim()));
+		for(String string : levelList) succes.add(Integer.parseInt(string.split(",")[2].trim()));
+		
+		List<String> incompatibleList = buy.getStringList("Incompatible-enchants");
+		if(!incompatibleList.isEmpty()) {
+			for(String string : incompatibleList){
+				Enchantment ench1 = Enchantment.getByKey(NamespacedKey.fromString(string.split(",")[0].trim()));
+				Enchantment ench2 = Enchantment.getByKey(NamespacedKey.fromString(string.split(",")[1].trim()));
+				String ench1Name = EventsClass.functions.IsCustomEnchant(ench1) ? ench1.getName() : EventsClass.functions.GetEnchantmentName(ench1); 
+				String ench2Name = EventsClass.functions.IsCustomEnchant(ench2) ? ench2.getName() : EventsClass.functions.GetEnchantmentName(ench2);
+				
+				if(ench == ench1) if(item.getItemMeta().hasEnchant(ench2)) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("not-compatible-with").replace("{ench}", ench2Name)); return true; }
+				if(ench == ench2) if(item.getItemMeta().hasEnchant(ench1)) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("not-compatible-with").replace("{ench}", ench1Name)); return true; }
 			}
-		}
-		if(possibleEnchants.size() == 0) { sender.sendMessage(ChatColor.RED + "No enchants from this package are valid for your current item."); return true; }
-		for(Entry<Enchantment, Integer> set : possibleEnchants.entrySet()) {
-			int maxAddition = set.getValue();
-			int toAdd = amount < maxAddition ? amount : maxAddition;
-			possibleEnchants.put(set.getKey(), toAdd);
+				
 		}
 		
+		if(item.getItemMeta().hasEnchant(ench)) {
+			if(ench == Enchantment.QUICK_CHARGE && item.getItemMeta().getEnchantLevel(ench) == 5) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("max-level")); return true; }
+			if(ench == Enchantment.LURE && item.getItemMeta().getEnchantLevel(ench) == 5) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("max-level")); return true; }
+			if(ench == Enchantment.DEPTH_STRIDER && item.getItemMeta().getEnchantLevel(ench) == 5) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("max-level")); return true; }
+			if(item.getItemMeta().getEnchantLevel(ench) >= maxLevel) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("max-level")); return true; }
+		}
 		double price = 0;
-		for(Enchantment ench : possibleEnchants.keySet()) {
-			if(item.getItemMeta().hasEnchant(ench)) {
-				for(int i = item.getItemMeta().getEnchantLevel(ench) + possibleEnchants.get(ench); i > item.getItemMeta().getEnchantLevel(ench); i--) {
-					price += i * Main.getPlugin().getConfig().getDouble("BuyCommandEnchants." + args[1] + ".Price");
+		int succesChance = 100;
+		for(int i = 0; i < levels.size(); i++) {
+			if(levels.get(i).equals(item.getItemMeta().getEnchantLevel(ench) + 1)) {
+				price = prices.get(i); 
+				succesChance = succes.get(i); 
 				}
-			}
-			else price += Main.getPlugin().getConfig().getDouble("BuyCommandEnchants." + args[1] + ".Price");
 		}
-		Main.Log("Price: " + price);
+		
+		if(price == 0) {
+			int lowest = 0;
+			for(int i = 0; i < levels.size(); i++) {
+				int value = levels.get(i);
+				if(value > lowest && value < (item.getItemMeta().getEnchantLevel(ench) + 1)) lowest = value;
+			}
+			if(lowest != 0) {
+				for(int i = 0; i < levels.size(); i++) {
+					if(levels.get(i).equals(lowest)) { price = prices.get(i); succesChance = succes.get(i); }
+				}
+				
+			}
+		}	
+		
 		if(!checkCost) {
 			if(Main.econ.has(sender, price)) Main.econ.withdrawPlayer(sender, price);
-			else { sender.sendMessage(ChatColor.RED + "You can't afford this! The price is: " + price + Main.econ.currencyNamePlural()); return true; }
-			for(Enchantment ench : possibleEnchants.keySet()) {
-				if(item.getItemMeta().hasEnchant(ench)) {
-					if(EventsClass.functions.IsCustomEnchant(ench)) EnchantPlayerItem(ench, item.getItemMeta().getEnchantLevel(ench) + possibleEnchants.get(ench), sender, false, false);
-					else item.addUnsafeEnchantment(ench, item.getItemMeta().getEnchantLevel(ench) + possibleEnchants.get(ench));
-				}
-				else {
-					if(EventsClass.functions.IsCustomEnchant(ench)) EnchantPlayerItem(ench, 1, sender, false, false);
-					else item.addUnsafeEnchantment(ench, 1);
-				}
+			else { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("cant-afford").replace("{price}", "" + price + Main.econ.currencyNamePlural())); return true; }
+			if(EventsClass.functions.GetRandomNumber(1, 100) > succesChance) { sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("buy-failed").replace("{chance}", "" + succesChance)); return true; }
+			if(item.getItemMeta().hasEnchant(ench)) {
+				if(EventsClass.functions.IsCustomEnchant(ench)) EnchantPlayerItem(ench, item.getItemMeta().getEnchantLevel(ench) + 1, sender, false, false);
+				else item.addUnsafeEnchantment(ench, item.getItemMeta().getEnchantLevel(ench) + 1);
 			}
-			sender.sendMessage(ChatColor.GREEN + "Succesfully bought package: '" + args[1] + "' for: " + price + Main.econ.currencyNamePlural());
+			else {
+				if(EventsClass.functions.IsCustomEnchant(ench)) EnchantPlayerItem(ench, 1, sender, false, false);
+				else item.addUnsafeEnchantment(ench, 1);
+			}
+			
+			sender.sendMessage(ChatColor.GREEN + LanguageManager.instance.GetTranslatedValue("bought-succes").replace("{enchantName}", enchName).replace("{price}", "" + price + Main.econ.currencyNamePlural()));
 		}
 		else {
-			String string = ChatColor.LIGHT_PURPLE + "Buying this package would add the following enchantments: ";
-			int i = 0;
-			for(Enchantment ench : possibleEnchants.keySet()) {
-				i++;
-				if(EventsClass.functions.IsCustomEnchant(ench)) string += ChatColor.WHITE + ench.getName() + (item.getItemMeta().hasEnchant(ench) ? " " +  (item.getItemMeta().getEnchantLevel(ench) + possibleEnchants.get(ench)) : ench.getMaxLevel() > 1 ? " " +  1 : "");
-				else string += ChatColor.WHITE + EventsClass.functions.GetEnchantmentName(ench) + (item.getItemMeta().hasEnchant(ench) ? " " +  (item.getItemMeta().getEnchantLevel(ench) + possibleEnchants.get(ench)) : ench.getMaxLevel() > 1 ? " " +  1 : "");
-				
-				if(i != possibleEnchants.size()) string += ", ";
-				else string += ".";
-			}
-			sender.sendMessage(string);
-			sender.sendMessage(ChatColor.LIGHT_PURPLE + "For a price of: " + ChatColor.WHITE + price + Main.econ.currencyNamePlural());
+			sender.sendMessage(ChatColor.LIGHT_PURPLE + LanguageManager.instance.GetTranslatedValue("cost-buy-message").replace("{ench}", enchName).replace("{level}", "" + (item.getItemMeta().getEnchantLevel(ench) + 1)).replace("{price}", price + Main.econ.currencyNamePlural()).replace("{chance}", "" + succesChance));
 		}
 		return true;
 		
@@ -331,32 +319,32 @@ public class CommandHandler implements CommandExecutor
 	public boolean EnchantPlayerItem(Enchantment ench, int level, Player sender, boolean sendMessage, boolean needsPermissions) {
 		if(needsPermissions) {
 			if(!sender.hasPermission("ee.command.enchant")) {
-				sender.sendMessage(ChatColor.RED + "You don't have permission for this command!");
+				sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("no-permission"));
 				return true;
 			}
 			if(sender.getInventory().getItemInMainHand() == null) {
-				sender.sendMessage(ChatColor.RED + "You are not holding an item!");
+				sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("no-holding-item"));
 				return true;
 			}
 			if(sender.getInventory().getItemInMainHand().getItemMeta() == null) {
-				sender.sendMessage(ChatColor.RED + "You are not holding a valid item!");
+				sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("not-holding-valid-item"));
 				return true;
 			}
 		}
 		ItemStack fs = sender.getInventory().getItemInMainHand();
 		if(fs.getItemMeta().hasEnchant(ench)) {
 			if(fs.getItemMeta().getEnchantLevel(ench) > level) {
-				sender.sendMessage(ChatColor.RED + "Item contains a higher level enchantment!");
+				sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("contains-higher-level"));
 				return true;
 			}
 			if(ench.getMaxLevel() == 1) {
-				sender.sendMessage(ChatColor.RED + "Item already contains enchantment!");
+				sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("already-contains"));
 				return true;
 			}
 			ItemStack resultItem = new ItemStack(fs);
 			int addLevel = fs.getItemMeta().getEnchantLevel(ench) == level ? level + 1 : level;
 			if(addLevel > ench.getMaxLevel()) {
-				if(sendMessage) sender.sendMessage(ChatColor.RED + "Enchantment is already max level!");
+				if(sendMessage) sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("already-max-level"));
 				return true;
 			}
 			resultItem.addUnsafeEnchantment(ench, addLevel);
@@ -428,16 +416,16 @@ public class CommandHandler implements CommandExecutor
 				resultItem.setItemMeta(itemMeta);
 			}
 			sender.getInventory().setItemInMainHand(resultItem);
-			if(sendMessage) sender.sendMessage("Enchanted item with [" + ChatColor.LIGHT_PURPLE + ench.getName() + (ench.getMaxLevel() > 1 ? " " : "") + EventsClass.functions.GetNameByLevel(level, ench.getMaxLevel()) + ChatColor.WHITE +  "]");
+			if(sendMessage) sender.sendMessage(ChatColor.WHITE + LanguageManager.instance.GetTranslatedValue("no-permission").replace("{enchant}", ChatColor.LIGHT_PURPLE + ench.getName() + (ench.getMaxLevel() > 1 ? " " : "") + EventsClass.functions.GetNameByLevel(level, ench.getMaxLevel())));
 			return true;
 			
 		}
 		if(!ench.canEnchantItem(fs)) {
-			sender.sendMessage(ChatColor.RED + "Can't apply enchantment to this item!");
+			sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("cant-apply"));
 			return true;
 		}
 		if(fs.getItemMeta().hasConflictingEnchant(ench)) {
-			sender.sendMessage(ChatColor.RED + "Item contains conflicting enchantment!");
+			sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("contains-conflict"));
 			return true;
 		}
 
@@ -517,7 +505,7 @@ public class CommandHandler implements CommandExecutor
 	@SuppressWarnings("deprecation")
 	public boolean GiveCustomBook(Enchantment ench, int level, Player sender) {
 		if(!sender.hasPermission("ee.command.give")) {
-			sender.sendMessage(ChatColor.RED + "You don't have permission for this command!");
+			sender.sendMessage(ChatColor.RED + LanguageManager.instance.GetTranslatedValue("no-permission"));
 			return true;
 		}
 		ItemStack item = Main.itemManager.CreateCustomBook(ench, level);
@@ -525,7 +513,7 @@ public class CommandHandler implements CommandExecutor
 		if(level < 1) return false;
 		sender.getInventory().addItem(item);
 		
-		sender.sendMessage(ChatColor.WHITE + "Gave Enchanted Book with Enchantment: [" + ChatColor.LIGHT_PURPLE + ench.getName() + (ench.getMaxLevel() > 1 ? " " : "") + EventsClass.functions.GetNameByLevel(level, ench.getMaxLevel()) + ChatColor.WHITE +  "]");
+		sender.sendMessage(ChatColor.WHITE + LanguageManager.instance.GetTranslatedValue("enchanted-with").replace("{enchant}", ChatColor.LIGHT_PURPLE + ench.getName() + (ench.getMaxLevel() > 1 ? " " : "") + EventsClass.functions.GetNameByLevel(level, ench.getMaxLevel())));
 		return true;
 	}
 }

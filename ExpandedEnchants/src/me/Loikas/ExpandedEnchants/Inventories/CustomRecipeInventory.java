@@ -18,6 +18,7 @@ import me.Loikas.ExpandedEnchants.EnchantmentInformation;
 import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
 import me.Loikas.ExpandedEnchants.Util.CustomEnchantmentRecipe;
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 
 public class CustomRecipeInventory implements InventoryHolder
 {
@@ -26,7 +27,7 @@ public class CustomRecipeInventory implements InventoryHolder
 	@SuppressWarnings("deprecation")
 	public CustomRecipeInventory (CustomEnchantmentRecipe recipe) {
 		if(recipe.recipe == null) {
-			inv = Bukkit.createInventory(null, 54, "§5§lEmpty Enchantment Book");
+			inv = Bukkit.createInventory(null, 54, "§5§l" + LanguageManager.instance.GetTranslatedValue("empty-book-inventory-title"));
 		}
 		else {
 			Enchantment ench = (Enchantment) recipe.recipe.getResult().getItemMeta().getEnchants().keySet().toArray()[0];
@@ -42,14 +43,14 @@ public class CustomRecipeInventory implements InventoryHolder
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) item.getItemMeta();
 		meta.setOwner("MHF_ArrowLeft");
-		meta.setDisplayName("§e§lBack");
+		meta.setDisplayName("§e§l" + LanguageManager.instance.GetTranslatedValue("inventory-back"));
 		item.setItemMeta(meta);
 		inv.setItem(0, item);
 		ItemStack result = null;
 		if(recipe.recipe != null) {
 			ItemStack desc = new ItemStack(Material.PAPER, 1);
 			ItemMeta descmeta = desc.getItemMeta();
-			descmeta.setDisplayName("§b§lDescription");
+			descmeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("inventory-description"));
 			List<String> desclore = new ArrayList<>();
 			for(String descString : EnchantmentInformation.descriptions[CustomEnchantsManager.GetIndex((Enchantment) recipe.recipe.getResult().getEnchantments().keySet().toArray()[0])].stringList) {
 				desclore.add("§f" + descString);
@@ -61,7 +62,7 @@ public class CustomRecipeInventory implements InventoryHolder
 			ItemStack canEnch = new ItemStack(Material.IRON_CHESTPLATE);
 			ItemMeta canMeta = canEnch.getItemMeta();
 			canMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON);
-			canMeta.setDisplayName("§b§lCan enchant");
+			canMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("inventory-can-enchant"));
 			List<String> canLore = new ArrayList<>();
 			for(String canString : EnchantmentInformation.enchantableOn[CustomEnchantsManager.GetIndex((Enchantment) recipe.recipe.getResult().getEnchantments().keySet().toArray()[0])].stringList) {
 				canLore.add("§f" + canString);
@@ -73,7 +74,7 @@ public class CustomRecipeInventory implements InventoryHolder
 			ItemStack conflict = new ItemStack(Material.BARRIER);
 			ItemMeta conflictMeta = conflict.getItemMeta();
 			conflictMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON);
-			conflictMeta.setDisplayName("§c§lConflicts with");
+			conflictMeta.setDisplayName("§c§l" + LanguageManager.instance.GetTranslatedValue("inventory-conflicts"));
 			List<String> conflictLore = new ArrayList<>();
 			for(String conflictString : EnchantmentInformation.conflictsWith[CustomEnchantsManager.GetIndex((Enchantment) recipe.recipe.getResult().getEnchantments().keySet().toArray()[0])].stringList) {
 				conflictLore.add("§f" + conflictString);
@@ -86,7 +87,7 @@ public class CustomRecipeInventory implements InventoryHolder
 			ItemMeta maxMeta = maxLevel.getItemMeta();
 			maxMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_PLACED_ON);
 			Enchantment ench = (Enchantment)recipe.recipe.getResult().getEnchantments().keySet().toArray()[0];
-			maxMeta.setDisplayName("§b§lMax Level: §f" + ench.getMaxLevel());
+			maxMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("inventory-max-level") + " §f" + ench.getMaxLevel());
 			maxLevel.setItemMeta(maxMeta);
 			inv.setItem(5, maxLevel);
 			
@@ -104,8 +105,9 @@ public class CustomRecipeInventory implements InventoryHolder
 					ItemStack craftItem = new ItemStack(recipe.items[i]);
 					if(i == 4) if(craftItem.getType() == Material.ENCHANTED_BOOK) {
 						ItemMeta craftMeta = craftItem.getItemMeta();
-						List<String> craftLore = new ArrayList<>(); craftLore.add("§fYou can find the recipe for this"); craftLore.add("§fin the top right in the"); craftLore.add("§fchoose custom recipe menu!");
-						craftLore.add("§bThis can also be a book enchanted"); craftLore.add("§bwith this enchant to"); craftLore.add("§bcreate a higher level book.");
+						List<String> craftLore = new ArrayList<>(); 
+						for(String string : LanguageManager.instance.GetTranslatedList("inventory-lore-empty-book-recipe-part1")) craftLore.add("§f" + string); 
+						for(String string : LanguageManager.instance.GetTranslatedList("inventory-lore-empty-book-recipe-part2")) craftLore.add("§b" + string); 
 						craftMeta.setLore(craftLore);
 						craftItem.setItemMeta(craftMeta);
 					}

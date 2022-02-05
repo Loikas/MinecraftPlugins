@@ -1,19 +1,25 @@
 package me.Loikas.ExpandedEnchants.Commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
+import me.Loikas.ExpandedEnchants.EventsClass;
 import me.Loikas.ExpandedEnchants.Main;
 
 public class CustomEnchantsTabCompleter implements TabCompleter
 {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
-		
+		Player player = (Player) sender;
 		ArrayList<String> returns = new ArrayList<String>();
 		if(sender.hasPermission("ee.command.give") && ((args[0].equalsIgnoreCase("") || args[0].equalsIgnoreCase("g") || args[0].equalsIgnoreCase("gi") || args[0].equalsIgnoreCase("giv") || args[0].equalsIgnoreCase("i") || args[0].equalsIgnoreCase("v") || args[0].equalsIgnoreCase("e")))) {
 			returns.add("give");
@@ -37,19 +43,26 @@ public class CustomEnchantsTabCompleter implements TabCompleter
 			returns.add("cost");
 		}
 		
-		if(args[0].equalsIgnoreCase("buy") || (args[0].equalsIgnoreCase("cost") && sender.hasPermission("ee.command.cost")) && args.length < 3 && Main.econ != null) {
-			if(args[0].equalsIgnoreCase("cost")) returns.add("repair");
-			for(String string : Main.getPlugin().getConfig().getConfigurationSection("BuyCommandEnchants").getKeys(false)) {
-				if(args.length == 2) {
-					if(args[1] != "") { if(string.contains(args[1]))  if(sender.hasPermission("ee.command.buy." + string)) returns.add(string); }
-					else { if(sender.hasPermission("ee.command.buy." + string)) returns.add(string); }
+		FileConfiguration buy = new YamlConfiguration();
+		try { buy.load("plugins/ExpandedEnchants/buy.yml"); }
+		catch (InvalidConfigurationException e) { e.printStackTrace(); buy = null;}
+		catch(IOException e) {buy = null;};
+		if(buy != null) {
+			if(args[0].equalsIgnoreCase("buy") || (args[0].equalsIgnoreCase("cost") && sender.hasPermission("ee.command.cost")) && args.length < 3 && Main.econ != null) {
+				if(args[0].equalsIgnoreCase("cost")) returns.add("repair");
+				ConfigurationSection name = buy.getConfigurationSection(EventsClass.functions.GetItemTypeName(player.getInventory().getItemInMainHand()));
+				if(name != null) {
+					for(String string : name.getKeys(false)) {
+						if(args.length == 2) {
+							//if(args[1] != "") { if(string.contains(args[1]))  if(sender.hasPermission("ee.command.buy." + string)) returns.add(string); }
+							//else { if(sender.hasPermission("ee.command.buy." + string)) returns.add(string); }
+							returns.add(string);
+						}
+						
+					}
+					return returns;
 				}
 			}
-			return returns;
-		}
-		if(args[0].equalsIgnoreCase("buy") || (args[0].equalsIgnoreCase("cost") && sender.hasPermission("ee.command.cost")) && args.length == 3 && !args[1].equalsIgnoreCase("repair") && Main.econ != null) {
-			returns.add("<amount>");
-			return returns;
 		}
 		if(returns.size() > 0) return returns;
 		if(!sender.hasPermission("ee.give") && !sender.hasPermission("ee.command.enchant")) return null;

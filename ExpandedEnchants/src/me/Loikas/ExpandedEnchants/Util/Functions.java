@@ -34,6 +34,24 @@ public class Functions
 		return list;
 	}
 	
+	public String GetItemTypeName(ItemStack item) {
+		if(CheckSwordTypes(item)) return "Sword";
+		if(CheckPickaxeTypes(item)) return "Pickaxe";
+		if(CheckAxeTypes(item)) return "Axe";
+		if(CheckShovelTypes(item)) return "Shovel";
+		if(CheckHoeTypes(item)) return "Hoe";
+		
+		if(item.getType() == Material.BOW) return "Bow";
+		if(item.getType() == Material.CROSSBOW) return "Crossbow";
+		if(item.getType() == Material.ELYTRA) return "Elytra";
+		
+		if(CheckHelmetTypes(item)) return "Helmet";
+		if(CheckChestplateTypes(item)) return "Chestplate";
+		if(CheckLeggingsTypes(item)) return "Leggings";
+		if(CheckBootsTypes(item)) return "Boots";
+		return "null";
+	}
+	
 	public boolean ContainsSmeltable(List<Item> items) {
 		for(Item item : items) {
 			switch(item.getItemStack().getType()) {

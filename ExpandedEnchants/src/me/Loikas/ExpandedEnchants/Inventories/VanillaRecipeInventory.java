@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import me.Loikas.ExpandedEnchants.Util.LanguageManager;
 import me.Loikas.ExpandedEnchants.Util.VanillaEnchantmentRecipe;
 
 public class VanillaRecipeInventory implements InventoryHolder
@@ -28,23 +29,21 @@ public class VanillaRecipeInventory implements InventoryHolder
 	public void ChangeRecipe(VanillaEnchantmentRecipe recipe) {
 		ItemStack bench = new ItemStack(Material.ANVIL);
 		ItemMeta benchMeta = bench.getItemMeta();
-		benchMeta.setDisplayName("§b§lAnvil");
-		benchMeta.setLore(Collections.singletonList("§fHas to be crafted in an anvil."));
+		benchMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("anvil-name"));
+		benchMeta.setLore(Collections.singletonList("§f" + LanguageManager.instance.GetTranslatedValue("crafted-in-anvil")));
 		bench.setItemMeta(benchMeta);
 		inv.setItem(12, bench);
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
 		SkullMeta meta = (SkullMeta) item.getItemMeta();
 		meta.setOwner("MHF_ArrowLeft");
-		meta.setDisplayName("§e§lBack");
+		meta.setDisplayName("§e§l" + LanguageManager.instance.GetTranslatedValue("inventory-back"));
 		item.setItemMeta(meta);
 		inv.setItem(0, item);
 		ItemStack book = new ItemStack(Material.BOOK, 1);
 		ItemMeta bookMeta = book.getItemMeta();
-		bookMeta.setDisplayName("§b§lBook, Tool, Weapon or Enchanted Book");
+		bookMeta.setDisplayName("§b§l" + LanguageManager.instance.GetTranslatedValue("book-tool-weapon"));
 		List<String> lore = new ArrayList<>();
-		lore.add("§fCan be a book, weapon, tool");
-		lore.add("§for enchanted book depending");
-		lore.add("§fon the enchantment.");
+		for(String string : LanguageManager.instance.GetTranslatedList("book-tool-weapon-lore")) lore.add("§f" + string);
 		bookMeta.setLore(lore);
 		book.setItemMeta(bookMeta);
 		inv.setItem(11, book);
