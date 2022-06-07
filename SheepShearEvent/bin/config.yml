@@ -1,0 +1,22 @@
+# Commands that fire when a player shears a sheep,
+# use (p) to fire it from the player that sheared the sheep 
+# !Make sure the player has the permission for the command when using (p)!
+# use (c) to fire it from the console
+# use {p} whenever you want to use the player in the command
+PlayerShearCommands:
+    - (p) tell {p} hi
+    - (c) say hi
+    - (c) msg {p} Sheep sheared!
+
+# Commands that fire when a block (like a dispenser) shears a sheep:
+BlockShearCommands:
+    - say Dispenser sheared a sheep
+    
+
+# If you want a list to be empty put a single - to make sure it is nothing
+# Otherwise it will execute the default commands
+# Like this:
+# PlayerShearCommands:
+#     -
+
+# Use /sse reload to reload the config after you made changes

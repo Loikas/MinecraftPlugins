@@ -1,0 +1,18 @@
+main: me.Loikas.SheepShearEvent.Main
+name: SheepShearEvent
+description: Fires config commands whenever a sheep is sheared
+author: Loikas
+api-version: 1.18
+version: 1.0
+commands:
+    sheepshearevent:
+        description: sheepshearevent command
+        usage: "Usage /<command>"
+        aliases: sse
+permissions:
+    sse.allow:
+        description: Allows you to fire the commands when you shear a sheep
+        default: true
+    sse.reload:
+        description: Allows you to use the reload command
+        default: op
