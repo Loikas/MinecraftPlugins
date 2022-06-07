@@ -1,0 +1,173 @@
+#Choose which custom enchants to enable
+#They will still remain on the items but wont do anything
+#To disable the crafting recipes you have to reload the server
+AntigravityEnabled: true
+AssassinEnabled: true
+AutosmeltEnabled: true
+BeheadingEnabled: true
+DeflectEnabled: true
+DirectEnabled: true
+DisarmingEnabled: true
+DisruptionEnabled: true
+ElementalprotectionEnabled: true
+EyesofowlEnabled: true
+ExperienceboostEnabled: true
+FeedingmoduleEnabled: true
+FlamingFallEnabled: true
+GourmandEnabled: true
+HealthboostEnabled: true
+HeavenslightnessEnabled: true
+IcyEnabled: true
+LavawalkerEnabled: true
+LeapingEnabled: true
+LifestealEnabled: true
+LumberjackEnabled: true
+OresightEnabled: true
+ReplantingEnabled: true
+ShadowstepEnabled: true
+SoulboundEnabled: true
+SplittingEnabled: true
+SteppingEnabled: true
+StonefistsEnabled: true
+ThermalplatingEnabled: true
+ThrustersEnabled: true
+TravelerEnabled: true
+UnbreakableEnabled: true
+VeinmineEnabled: true
+WideEnabled: true
+
+#Choose if you want to enable the plugin checking for updates
+EnableUpdateCheck: true
+
+#Enable vault integration if you have vault installed on your server
+#If you don't have vault this option doesn't have any impact
+EnableVaultIntegration: true
+
+#This feature only affects item repairing if ExpandedEnchants is integrated with vault.
+#Choose whether players can repair items if they have no enchants on these items.
+#Set a default value when players have no enchantments.
+AllowNoEnchantRepair: false
+DefaultRepairCost: 0
+
+#Choose if the higher than vanilla enchanting is enabled
+EnableVanillaOverride: true
+
+#Set the max level vanilla enchants can become using the plugin
+#Ignore if EnableVanillaOverride is set to false
+MaxVanillaEnchantLevel: 10
+
+#Choose if you want to enable disenchanting
+AllowDisenchanting: true
+
+#Choose if you want to allow resource enchanting
+AllowResourceEnchant: true
+
+#Choose if you want resource enchants to cost xp
+#Ignore when AllowResourceEnchant is set to false
+ResourceEnchantXpEnabled: true
+
+#Choose if you want to enable xp drops when mining with autosmelt
+RewardXpOnAutosmelt: true
+
+#Choose whether you want to enable the smelting from
+#rotten flesh to leather for easier creation of books
+LeatherSmeltEnabled: true
+
+#Percentage chance that the wandering trader spawns with a custom enchant offer
+#Set to 0 for no special offers
+WanderingTraderChance: 30
+
+#Percentage chance that a librarian spawn with a custom enchant offer
+#Set to 0 for no special offers
+LibrarianTradeChance: 20
+
+#Percentage chance that a custom enchant book will spawn in an endcity
+#Set to 0 to make them never spawn
+EndCityChance: 40
+
+#Percentage chance that a custom enchantment will show up in the enchanting table
+#Set to 0 to make them never show up
+EnchantingTableChance: 5
+
+#Set the amount of emeralds the deflect enchant uses every time it deflects damage
+DeflectCost: 1
+
+#Set the range in which oresight reveals ores per level of oresight
+OreSightRange: 10
+
+#Choose if ore sight shows the total ores of all past level
+#or only the current level
+OreSightAddUp: false
+
+#Choose if you want to enable the soulbound totem and if you want players 
+#to be able to upgrade it to level 2
+SoulboundTotemEnabled: true
+SoulboundTotemLevel2Enabled: true
+
+VeinmineBlocks:
+    - IRON_ORE
+    - GOLD_ORE
+    - COPPER_ORE
+    - COAL_ORE
+    - DIAMOND_ORE
+    - EMERALD_ORE
+    - LAPIS_ORE
+    - REDSTONE_ORE
+    
+#Choose how to activate the veinmine enchant, choose between SNEAKING, STANDING or BOTH:
+VeinmineMode: SNEAKING    
+    
+LumberjackBlocks:
+    - ACACIA_LOG
+    - OAK_LOG
+    - SPRUCE_LOG
+    - BIRCH_LOG
+    - DARK_OAK_LOG
+    - JUNGLE_LOG
+    
+#Choose how to activate the lumberjack enchant, choose between SNEAKING, STANDING or BOTH:
+LumberjackMode: SNEAKING
+
+#Choose whether to enable saturation mode on the feeding module
+#which causes you to eat immediatly when loosing half a hunger bar 
+#in order to keep your health full
+EnableSaturationMode: false
+
+#Which foods will be eaten by the feeding module enchant. HAS TO BE EDIBLE
+FeedingModuleFoods:
+    - APPLE
+    - BAKED_POTATO
+    - BEETROOT
+    - BEETROOT_SOUP
+    - BREAD
+    - CARROT
+    - COOKED_BEEF
+    - COOKED_CHICKEN
+    - COOKED_COD
+    - COOKED_MUTTON
+    - COOKED_PORKCHOP
+    - COOKED_RABBIT
+    - COOKED_SALMON
+    - COOKIE
+    - GLOW_BERRIES
+    - GOLDEN_CARROT
+    - HONEY_BOTTLE
+    - MELON_SLICE
+    - MUSHROOM_STEW
+    - POTATO
+    - PUMPKIN_PIE
+    - RABBIT_STEW
+    - SWEET_BERRIES
+    
+#Choose how to activate the wide enchant for mining blocks
+#choose between SNEAKING, STANDING or BOTH
+WideActivationMode: SNEAKING    
+    
+#Choose how to activate the wide enchant, for hoeing farmland,
+#pathing dirt and stripping wood
+#choose between SNEAKING, STANDING or BOTH:
+WideSpecialActionMode: SNEAKING
+
+#Version of config
+#DONT CHANGE
+configVersion: 1.1
