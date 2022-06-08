@@ -1,0 +1,13 @@
+main: me.Loikas.PearlFix.Main
+name: PearlFix
+description: Prevents the player from throwing enderpearls if they are close to and looking at blocks
+author: Loikas
+api-version: 1.17
+version: 1.0
+permissions:
+    pearlfix.bypass:
+        description: Allows you to bypass the fix
+        default: op
+    pearlfix.message:
+        description: Allows you to get a message if a player tries to block glitch
+        default: op
